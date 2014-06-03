@@ -1,0 +1,85 @@
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+
+ext {
+    // update also buildscript below!
+    springBootVersion = "1.0.2.RELEASE"
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "http://repo.spring.io/libs-snapshot" }
+        maven { url "http://repo.spring.io/milestone" }
+   	}
+
+   	dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.2.RELEASE")
+    }
+}
+
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+    apply plugin: 'spring-boot'
+
+	project.sourceCompatibility = 1.7
+	project.version = '0.1.0'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "http://repo.spring.io/libs-snapshot" }
+        maven { url "https://repository.apache.org/content/groups/snapshots/" }
+    }
+    
+    configurations {
+        doclet
+    }
+    
+    dependencies {
+        doclet 'ch.raffael.pegdown-doclet:pegdown-doclet:1.1.1'
+    }
+    
+    javadoc {
+        options.docletpath = configurations.doclet.files.asType(List)
+        options.doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
+    }
+}
+
+project(':dirama-server') {
+    jar {
+        baseName = 'dirama-service'
+        version =  project.version
+        
+        manifest {
+        	attributes("Implementation-Title": baseName, "Implementation-Version": project.version)
+    	}
+    }
+    
+    mainClassName = "de.miq.dirama.server.config.Application"
+    
+    dependencies {
+        compile("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
+        compile("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
+        compile("org.springframework.boot:spring-boot-starter-batch:$springBootVersion")
+        compile("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
+        compile("org.hsqldb:hsqldb")
+
+        compile("org.apache.httpcomponents:httpclient:4.3.2")
+    
+        compile("com.fasterxml.jackson.core:jackson-databind:2.3.1")
+        compile("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.3.1")
+        
+        compile("commons-io:commons-io:2.4")
+        compile("org.apache.commons:commons-lang3:3.1")
+        
+        compile("org.apache.commons:commons-imaging:1.0-SNAPSHOT")
+                
+        compile("org.elasticsearch:elasticsearch:1.1.1")
+    }
+}
+

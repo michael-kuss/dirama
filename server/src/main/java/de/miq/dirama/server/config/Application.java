@@ -12,11 +12,14 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestTemplate;
 
 @EnableAutoConfiguration
 @EnableAsync
 @EnableElasticsearchRepositories("de.miq.dirama.server.repository")
 @EnableSpringDataWebSupport
+@EnableScheduling
 @Configuration
 @ComponentScan(basePackages = { "de.miq.dirama.server.controller",
         "de.miq.dirama.server.config", "de.miq.dirama.server.services",
@@ -27,6 +30,11 @@ public class Application implements CommandLineRunner {
     public ElasticsearchOperations elasticsearchTemplate() {
         return new ElasticsearchTemplate(NodeBuilder.nodeBuilder().local(true)
                 .node().client());
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
     @Override

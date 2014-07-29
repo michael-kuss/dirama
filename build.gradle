@@ -27,7 +27,7 @@ subprojects {
     apply plugin: 'spring-boot'
 
 	project.sourceCompatibility = 1.7
-	project.version = '0.1.0'
+	project.version = '0.5.0'
 
     repositories {
         mavenLocal()
@@ -64,12 +64,20 @@ project(':dirama-server') {
     
     dependencies {
         compile("org.springframework.boot:spring-boot-starter-web:$springBootVersion")        
-        //compile("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
-        //compile("org.springframework.boot:spring-boot-starter-batch:$springBootVersion")
+     
+        compile("org.springframework.boot:spring-boot-starter-aop:$springBootVersion")        
+        //compile("org.springframework.boot:spring-boot-starter-data-rest")
+        //compile("org.springframework.boot:spring-boot-starter-data-jpa")
+        //compile("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+        compile("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
+        compile("org.springframework.boot:spring-boot-starter-batch:$springBootVersion")
         //compile("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
-        compile("org.hsqldb:hsqldb")
-        compile("org.springframework.data:spring-data-elasticsearch:1.0.0.BUILD-SNAPSHOT")
-        compile("org.elasticsearch:elasticsearch:1.1.1")
+        //compile("org.hsqldb:hsqldb")
+        compile("org.springframework.data:spring-data-elasticsearch:1.1.0.BUILD-SNAPSHOT")
+        compile("org.springframework.data:spring-data-rest-webmvc:2.1.0.RELEASE")
+        // compile("org.elasticsearch:elasticsearch:1.1.1")
+        
+        compile("org.springframework.social:spring-social-twitter:1.1.0.RELEASE")
         
         compile("org.apache.httpcomponents:httpclient:4.3.2")
     
@@ -77,6 +85,8 @@ project(':dirama-server') {
         compile("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.3.1")
         
         compile("commons-io:commons-io:2.4")
+        compile("commons-net:commons-net:3.3")
+        
         compile("org.apache.commons:commons-lang3:3.1")
         
         compile("org.apache.commons:commons-imaging:1.0-SNAPSHOT")

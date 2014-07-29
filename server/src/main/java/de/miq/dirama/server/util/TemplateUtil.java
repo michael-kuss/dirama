@@ -2,7 +2,6 @@ package de.miq.dirama.server.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -15,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,6 +47,8 @@ public class TemplateUtil {
         List<Title> titles = titleRepository.findByStation(station, pageable)
                 .getContent();
 
+        List<File> uploadFiles = new ArrayList<File>();
+
         for (File template : findFiles(templateDir)) {
             try {
                 String str = readFile(template.getAbsolutePath(),
@@ -63,6 +65,20 @@ public class TemplateUtil {
                             template);
                     str = replace("TIME", str, pos,
                             TIME.format(title.getTime()), template);
+                    str = replace("WEBIMAGE", str, pos, title.getWebImage(),
+                            template);
+                    str = replace("DABIMAGE", str, pos, title.getDabImage(),
+                            template);
+                    str = replace("ADDITIONAL1_", str, pos,
+                            title.getAdditional1(), template);
+                    str = replace("ADDITIONAL2_", str, pos,
+                            title.getAdditional2(), template);
+                    str = replace("ADDITIONAL3_", str, pos,
+                            title.getAdditional3(), template);
+                    str = replace("ADDITIONAL4_", str, pos,
+                            title.getAdditional4(), template);
+                    str = replace("ADDITIONAL5_", str, pos,
+                            title.getAdditional5(), template);
                 }
 
                 File uploadFile = new File(uploadDir, template.getName());
@@ -74,17 +90,22 @@ public class TemplateUtil {
                     out.close();
                 }
 
-                NetUtilities.uploadToFtp(ftpServer, user, password,
-                        template.getName(), new FileInputStream(uploadFile));
-                LOG.info("upload finished " + uploadFile.getName() + "!");
+                uploadFiles.add(uploadFile);
+
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
             }
         }
+
+        NetUtilities.uploadToFtp(ftpServer, user, password, uploadFiles);
     }
 
     private static String replace(String token, String str, int pos,
             String entry, File template) {
+        if (entry == null) {
+            return str;
+        }
+
         try {
             return str.replaceAll("@" + token + pos + "@",
                     entry.replace("$", "╔")).replace("╔", "$");

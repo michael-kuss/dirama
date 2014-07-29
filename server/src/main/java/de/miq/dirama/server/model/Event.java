@@ -3,7 +3,11 @@ package de.miq.dirama.server.model;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldIndex;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -11,13 +15,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class Event {
     @Id
     private String id;
-    @JsonFormat(pattern = "yyyyMMddHHmmss", timezone = "UTC")
+    @Field(format = DateFormat.basic_date_time, pattern = "yyyyMMddHHmmss", type = FieldType.Date)
+    @JsonFormat(pattern = "yyyyMMddHHmmss")
     private Date startDate;
+    @Field(type = FieldType.Long, index = FieldIndex.not_analyzed)
     private long reaccuring;
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String event;
 
-    private Event() {
-
+    public Event() {
     }
 
     public Event(Date startDate, long reaccuring, String event) {

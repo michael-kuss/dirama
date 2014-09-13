@@ -87,7 +87,7 @@ public class NowPlayingController {
                     throw new ParseException("Date not now", 0);
                 }
             }
-        } catch (ParseException e) {
+        } catch (Throwable e) {
             LOG.error(e.getMessage() + "; time=" + time, e);
             date = new Date();
         }

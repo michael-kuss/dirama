@@ -158,7 +158,7 @@ public class NetUtilities {
         ftp.setConnectTimeout(30000);
         ftp.setDefaultTimeout(30000);
         ftp.setAutodetectUTF8(true);
-        ftp.setTcpNoDelay(true);
+        //ftp.setTcpNoDelay(true);
 
         ftp.connect(ftpServer);
 

@@ -254,7 +254,6 @@ public class TriggerActionService {
             LOG.info("actionHttpGet('" + id + "', ...)");
 
             NetUtilities.getData(restTemplate, url, resolvedParameters);
-            Thread.sleep(5000);
             return true;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -502,27 +501,5 @@ public class TriggerActionService {
             tit.setTextContent(title);
         }
         channel.appendChild(item);
-    }
-
-    private static void twitterTimeline() {
-        Twitter twitter = new TwitterTemplate("zfL9KdFoOCs63mdQdkFhh9hUz",
-                "PJlJoD8hplfLYTD7OGmokjYZ6HcndV1xDXoyn5SCuocBerlp14",
-                "2598416185-LoS4lSFInXzPPNYXMr33UBbVwoxJnWG1PmzJMKJ",
-                "Ijnaiwe5wYNTAbeh6vRthRXsVt4McRFi0H9OrGCUdanAV");
-
-        long last = 0;
-        long test = 0;
-        do {
-            test = last;
-            System.out.println(last);
-            for (Tweet tweet : twitter.timelineOperations().getHomeTimeline(
-                    200, 0, last)) {
-                if (tweet.getFavoriteCount() > 0) {
-                    System.out.println(tweet.getText() + "   :   "
-                            + tweet.getFavoriteCount());
-                }
-                last = tweet.getId();
-            }
-        } while (last > 0 && test != last);
     }
 }

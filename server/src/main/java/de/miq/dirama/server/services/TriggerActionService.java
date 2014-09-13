@@ -417,14 +417,6 @@ public class TriggerActionService {
 
         System.out.println(e.getValue(context));
 
-        // Twitter twitter = new TwitterTemplate("LVviJVWQ4EljplLvVvoeDiTmg",
-        // "ZWkZEVc51WdFASubvSz9m3SYO4B9YXfIAjPe4B2j49jo3T4wEX",
-        // "1524867962-inFjddrhxiKwCJUCA7iXRgGIm6LZeMrYjesXxxa",
-        // "LOI8P5zJ4X6otNYXjlQAbSmyicqp8PJTHFNohVdUQgjmU");
-        //
-        // TweetData data = new TweetData(StringUtils.left("Ümlauttest", 140));
-        // twitter.timelineOperations().updateStatus(data);
-
         Document doc = createDocument(true);
 
         writeDocument(doc, "iso-8859-1", new FileWriter(

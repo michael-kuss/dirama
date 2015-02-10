@@ -22,13 +22,12 @@ public class ConfigService {
     public String getConfig(String key) {
         Config c = config.findOne(key);
         if (c != null) {
-            LOG.info("Config from es <" + key + ">=<" + c.getValue() + ">");
+            //LOG.info("Config from es <" + key + ">=<" + c.getValue() + ">");
             return c.getValue();
         }
         for (Config tc : triggerConfig.getSettings()) {
             if (tc.getKey().equals(key)) {
-                LOG.info("Config from file <" + key + ">=<" + tc.getValue()
-                        + ">");
+                //LOG.info("Config from file <" + key + ">=<" + tc.getValue()+ ">");
                 return tc.getValue();
             }
         }

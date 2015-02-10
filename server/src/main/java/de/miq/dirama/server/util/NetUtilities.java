@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -18,6 +22,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 public class NetUtilities {
+    private static final int BUFFER = 1024 * 1024;
+    private static final int CONNECTION_TIMEOUT = 10000;
     private static final Log LOG = LogFactory.getLog(NetUtilities.class);
     private static final String DYNAMICLABEL = "https://{contentServer}:24/?login={user}&password={passwd}&type=import&really=1&content={content}";
     private static final String SLIDESHOW = "https://{contentServer}:24/?login={user}&password={passwd}&type=import";
@@ -65,39 +71,53 @@ public class NetUtilities {
     public static void uploadToFtp(String ftpServer, String user,
             String password, String fileName, InputStream fileStream,
             String deleteFileName) {
-        try {
-            FTPClient ftp = null;
+        int retryCount = 0;
+        while (true) {
             try {
-                ftp = login(ftpServer, user, password);
+                FTPClient ftp = null;
+                try {
+                    ftp = login(ftpServer, user, password);
 
-                if (deleteFileName != null) {
-                    ftp.deleteFile(deleteFileName);
-                }
-
-                String fileTest = fileName.toLowerCase();
-                if (fileTest.endsWith("txt") || fileTest.endsWith("htm")
-                        || fileTest.endsWith("html")
-                        || fileTest.endsWith("json")) {
-                    ftp.setFileType(FTP.ASCII_FILE_TYPE);
-                } else {
-                    ftp.setFileType(FTP.BINARY_FILE_TYPE);
-                }
-
-                LOG.info("upload to ftp " + user + "@" + ftpServer + "/"
-                        + fileName);
-                ftp.storeFile(fileName, fileStream);
-            } finally {
-                if (ftp != null && ftp.isConnected()) {
-                    try {
-                        ftp.disconnect();
-                    } catch (IOException e) {
-                        // do nothing
+                    if (deleteFileName != null) {
+                        ftp.deleteFile(deleteFileName);
                     }
+
+                    String fileTest = fileName.toLowerCase();
+                    if (fileTest.endsWith("txt") || fileTest.endsWith("htm")
+                            || fileTest.endsWith("html")
+                            || fileTest.endsWith("json")) {
+                        ftp.setFileType(FTP.ASCII_FILE_TYPE);
+                    } else {
+                        ftp.setFileType(FTP.BINARY_FILE_TYPE);
+                    }
+
+                    try {
+                        long start = System.currentTimeMillis();
+                        LOG.info("upload to ftp " + user + "@" + ftpServer
+                                + "/" + fileName);
+                        ftp.storeFile(fileName, new BufferedInputStream(
+                                fileStream, BUFFER));
+                        LOG.info("upload finished to ftp " + user + "@"
+                                + ftpServer + "/" + fileName + " in "
+                                + (System.currentTimeMillis() - start) + "ms");
+                    } finally {
+                        IOUtils.closeQuietly(fileStream);
+                    }
+                } finally {
+                    logout(ftp);
                 }
-                IOUtils.closeQuietly(fileStream);
+                break;
+            } catch (Throwable e) {
+                LOG.error(
+                        "Error during file upload, resetting connection for <"
+                                + fileName + ">", e);
+                retryCount++;
+
+                if (retryCount > 3) {
+                    LOG.error("Dismissing upload as failed <" + fileName + ">");
+                    break;
+                }
             }
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -108,7 +128,10 @@ public class NetUtilities {
             try {
                 ftp = login(ftpServer, user, password);
 
-                for (File file : files) {
+                File last = null;
+                int retryCount = 0;
+                for (int pos = 0; pos < files.size(); pos++) {
+                    File file = files.get(pos);
                     try {
                         String fileTest = file.getName().toLowerCase();
                         if (fileTest.endsWith("txt")
@@ -119,8 +142,9 @@ public class NetUtilities {
                         } else {
                             ftp.setFileType(FTP.BINARY_FILE_TYPE);
                         }
+
                         InputStream fileStream = new BufferedInputStream(
-                                new FileInputStream(file));
+                                new FileInputStream(file), BUFFER);
 
                         try {
                             long start = System.currentTimeMillis();
@@ -134,33 +158,70 @@ public class NetUtilities {
                         } finally {
                             IOUtils.closeQuietly(fileStream);
                         }
-                    } catch (Exception e) {
-                        LOG.error(e.getMessage(), e);
+                    } catch (Throwable e) {
+                        LOG.error(
+                                "Error during file upload, resetting connection for <"
+                                        + file.getName() + ">", e);
+                        logout(ftp);
+                        ftp = login(ftpServer, user, password);
+                        retryCount++;
+                        if (!file.equals(last)) {
+                            pos--;
+                        }
+
+                        if (retryCount > 3) {
+                            LOG.error("Dismissing upload as failed <"
+                                    + file.getName() + ">");
+                            break;
+                        }
                     }
+                    last = file;
                 }
             } finally {
-                if (ftp != null && ftp.isConnected()) {
-                    try {
-                        ftp.disconnect();
-                    } catch (IOException e) {
-                        // do nothing
-                    }
-                }
+                logout(ftp);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
+        }
+    }
+
+    private static void logout(FTPClient ftp) {
+        try {
+            ftp.logout();
+        } catch (Throwable e) {
+            // do nothing
+        }
+        try {
+            ftp.disconnect();
+        } catch (Throwable e) {
+            // do nothing
         }
     }
 
     private static FTPClient login(String ftpServer, String user,
             String password) throws IOException {
-        FTPClient ftp = new FTPClient();
-        ftp.setConnectTimeout(30000);
-        ftp.setDefaultTimeout(30000);
-        ftp.setAutodetectUTF8(true);
-        //ftp.setTcpNoDelay(true);
+        if (ftpServer == null || ftpServer.trim().equals("")) {
+            return null;
+        }
 
-        ftp.connect(ftpServer);
+        FTPClient ftp = new FTPClient();
+        ftp.setRemoteVerificationEnabled(false);
+        ftp.setControlKeepAliveTimeout(30);
+        ftp.setConnectTimeout(CONNECTION_TIMEOUT);
+        ftp.setAutodetectUTF8(true);
+
+        if (ftpServer.contains(":")) {
+            int index = ftpServer.indexOf(":");
+            String host = ftpServer.substring(0, index);
+            String port = ftpServer.substring(index + 1);
+            ftp.connect(host, Integer.parseInt(port));
+        } else {
+            ftp.connect(ftpServer);
+        }
+
+        ftp.setSoTimeout(CONNECTION_TIMEOUT);
+        ftp.setTcpNoDelay(true);
+        ftp.setSoLinger(true, CONNECTION_TIMEOUT);
 
         int reply = ftp.getReplyCode();
 
@@ -175,9 +236,33 @@ public class NetUtilities {
             return null;
         }
 
-        ftp.setFileTransferMode(FTP.COMPRESSED_TRANSFER_MODE);
+        ftp.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
         ftp.enterLocalPassiveMode();
 
         return ftp;
+    }
+
+    public static InputStream getInputStream(String url) throws IOException {
+        URLConnection con = new URL(url).openConnection();
+        con.setConnectTimeout(CONNECTION_TIMEOUT);
+        con.setReadTimeout(CONNECTION_TIMEOUT);
+        con.setUseCaches(true);
+        try {
+            return con.getInputStream();
+        } catch (IOException ex) {
+            // Close the HTTP connection (if applicable).
+            if (con instanceof HttpURLConnection) {
+                ((HttpURLConnection) con).disconnect();
+            }
+            throw ex;
+        }
+    }
+
+    public static void main(String[] args) {
+        List<File> files = new ArrayList<File>();
+        files.add(new File("C:/zl.txt"));
+
+        NetUtilities.uploadToFtp("localhost:9090", "user", "password", files);
+        NetUtilities.uploadToFtp("localhost", "user", "password", files);
     }
 }

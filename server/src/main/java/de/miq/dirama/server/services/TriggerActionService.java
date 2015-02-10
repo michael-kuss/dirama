@@ -1,16 +1,14 @@
 package de.miq.dirama.server.services;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URI;
-import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -24,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,7 +32,6 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.social.twitter.api.Tweet;
 import org.springframework.social.twitter.api.TweetData;
 import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
@@ -95,7 +92,6 @@ public class TriggerActionService {
      * @param id
      * @param fileName
      * @param fileUrl
-     * @param alternateUrl
      */
     public boolean actionSendObject(String id, String fileName, Object object) {
         try {
@@ -155,13 +151,11 @@ public class TriggerActionService {
             String urlUsed = fileUrl;
 
             try {
-                URL url = new URL(fileUrl);
-                fileStream = url.openStream();
+                fileStream = NetUtilities.getInputStream(fileUrl);
             } catch (IOException e) {
                 LOG.error("URL not found <" + fileUrl + ">");
                 urlUsed = alternateUrl;
-                URL url = new URL(alternateUrl);
-                fileStream = url.openStream();
+                fileStream = NetUtilities.getInputStream(alternateUrl);
             }
 
             // png or jpg. delete old file first
@@ -307,6 +301,35 @@ public class TriggerActionService {
         return false;
     }
 
+    public boolean actionDynamicLabelXML(String id, String label) {
+        try {
+            String ftpServer = config.getConfig(id + ".ftpServer");
+            String user = config.getConfig(id + ".user");
+            String password = config.getConfig(id + ".password");
+
+            if (ftpServer == null || user == null || password == null) {
+                LOG.error("Configuration error for actionUpdateLabelXML('" + id
+                        + "')");
+                return false;
+            }
+
+            LOG.info("actionUpdateLabelXML('" + id + "')");
+
+            Document doc = createDocument(true, label);
+
+            StringWriter strWriter = new StringWriter();
+            writeDocument(doc, "iso-8859-1", strWriter);
+
+            NetUtilities.uploadToFtp(ftpServer, user, password,
+                    "DynamicLabel.xml", new ByteArrayInputStream(strWriter
+                            .toString().getBytes(StandardCharsets.ISO_8859_1)));
+            return true;
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
     public boolean actionTweet(String id, String message, String pictureUrl) {
         try {
             String consumerKey = config.getConfig(id + ".consumerKey");
@@ -328,7 +351,8 @@ public class TriggerActionService {
 
             TweetData data = new TweetData(StringUtils.left(message, 140));
             if (StringUtils.trimToNull(pictureUrl) != null) {
-                data.withMedia(new UrlResource(pictureUrl));
+                data.withMedia(new InputStreamResource(NetUtilities
+                        .getInputStream(pictureUrl)));
             }
 
             int count = 0;
@@ -358,13 +382,22 @@ public class TriggerActionService {
 
     @Async
     public void executeTrigger(Trigger trigger, Title title) {
-        try {
-            while (locks.contains(trigger.getId())) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
+        LOG.debug("START TRIGGER ---------");
+
+        int count = 0;
+        while (locks.contains(trigger.getId())) {
+            try {
+                LOG.debug("SLEEP TRIGGER ---------");
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
             }
+            if (count++ > 10) {
+                // give up
+                LOG.error("Giving up on trigger <" + trigger + ">");
+                return;
+            }
+        }
+        try {
             synchronized (locks) {
                 locks.add(trigger.getId());
             }
@@ -389,6 +422,7 @@ public class TriggerActionService {
             synchronized (locks) {
                 locks.remove(trigger.getId());
             }
+            LOG.debug("END   TRIGGER ---------");
         }
     }
 
@@ -396,44 +430,6 @@ public class TriggerActionService {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO); // change to debug
 
-        Title title = new Title("berlin", "Übertragung", "Übertragung", "dab",
-                "web", new Date(), null, null, null, null, null);
-
-        ExpressionParser expressionParser = new SpelExpressionParser();
-        Expression e = expressionParser
-                .parseExpression("new java.lang.Thread().sleep(10000) and 'test'");
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        context.setVariable("title", title);
-        context.setVariable("datetime", SimpleDateFormat.class);
-
-        System.out.println(e.getValue(context));
-
-        expressionParser = new SpelExpressionParser();
-        e = expressionParser
-                .parseExpression("new java.text.SimpleDateFormat('dd.MM.YYYY HH:mm').format(#title.time) + ' : ' + #title.artist + ' - ' + #title.title");
-        context = new StandardEvaluationContext();
-        context.setVariable("title", title);
-        context.setVariable("datetime", SimpleDateFormat.class);
-
-        System.out.println(e.getValue(context));
-
-        Document doc = createDocument(true);
-
-        writeDocument(doc, "iso-8859-1", new FileWriter(
-                "C:/pure_iso-8859_cdata.xml"));
-        writeDocument(doc, "ascii", new FileWriter("C:/pure_ascii_cdata.xml"));
-        writeDocument(doc, "utf-8", new FileWriter("C:/pure_utf-8_cdata.xml"));
-        doc = createDocument(false);
-
-        writeDocument(doc, "iso-8859-1", new FileWriter(
-                "C:/pure_iso-8859_text.xml"));
-        writeDocument(doc, "ascii", new FileWriter("C:/pure_ascii_text.xml"));
-        writeDocument(doc, "utf-8", new FileWriter("C:/pure_utf-8_text.xml"));
-
-        URI expanded = new UriTemplate(
-                "http://localhost:9090/nowplaying/{config.id.station}")
-                .expand("berlin");
-        System.out.println(expanded);
     }
 
     private static void writeDocument(Document doc, String encoding,
@@ -445,14 +441,14 @@ public class TriggerActionService {
         format.setOmitDocumentType(false);
         format.setOmitXMLDeclaration(false);
 
-        format.setLineWidth(100);
+        format.setLineWidth(0);
         format.setIndenting(true);
-        format.setIndent(5);
+        format.setIndent(0);
         XMLSerializer serializer = new XMLSerializer(output, format);
         serializer.serialize(doc);
     }
 
-    private static Document createDocument(boolean cdata)
+    private static Document createDocument(boolean cdata, String text)
             throws ParserConfigurationException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory
                 .newInstance();
@@ -470,11 +466,7 @@ public class TriggerActionService {
         Element description = doc.createElement("description");
         channel.appendChild(description);
 
-        createTitle(doc, channel,
-                "pure fm - bayerns dance radio  -  www.pure-fm.de", cdata);
-        createTitle(doc, channel, "WIR SPIELEN DIE TRACKS AUS DEN KLUBS", cdata);
-        createTitle(doc, channel,
-                "Jetzt : Björn Störig ft. Meggy - Maybe U & I", cdata);
+        createTitle(doc, channel, text, cdata);
 
         doc.appendChild(rss);
         return doc;

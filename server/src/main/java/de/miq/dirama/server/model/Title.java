@@ -2,6 +2,8 @@ package de.miq.dirama.server.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -42,6 +44,8 @@ public class Title {
     private String additional4;
     @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String additional5;
+    @Field(type = FieldType.Nested)
+    private Map<String, String> properties;
 
     public Title() {
     }
@@ -119,6 +123,68 @@ public class Title {
 
     public String getAdditional5() {
         return additional5;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void addProperty(String key, String value) {
+        if (this.properties == null) {
+            this.properties = new HashMap<String, String>();
+        }
+        this.properties.put(key, value);
+    }
+
+    public String getProperty(String key) {
+        if (this.properties == null) {
+            return null;
+        }
+        return this.properties.get(key);
+    }
+
+    public void setStation(String station) {
+        this.station = station;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDabImage(String dabImage) {
+        this.dabImage = dabImage;
+    }
+
+    public void setWebImage(String webImage) {
+        this.webImage = webImage;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public void setAdditional1(String additional1) {
+        this.additional1 = additional1;
+    }
+
+    public void setAdditional2(String additional2) {
+        this.additional2 = additional2;
+    }
+
+    public void setAdditional3(String additional3) {
+        this.additional3 = additional3;
+    }
+
+    public void setAdditional4(String additional4) {
+        this.additional4 = additional4;
+    }
+
+    public void setAdditional5(String additional5) {
+        this.additional5 = additional5;
     }
 
     @Override

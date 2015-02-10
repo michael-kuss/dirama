@@ -11,4 +11,7 @@ import de.miq.dirama.server.model.Title;
 
 public interface EventRepository extends ElasticsearchRepository<Event, String> {
     Page<Title> findByStartDate(Date startDate, Pageable pageable);
+
+    Page<Title> findByStartDateAndEndDate(Date startDate, Date endDate,
+            Pageable pageable);
 }

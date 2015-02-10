@@ -24,19 +24,18 @@ import org.springframework.data.elasticsearch.core.ResultsExtractor;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import de.miq.dirama.server.model.Title;
 import de.miq.dirama.server.repository.TitleRepository;
 
-@Controller
-@RequestMapping("/history")
+@RestController
+@RequestMapping(value = "/history", produces = "application/json")
 public class HistoryController {
     private static final Log LOG = LogFactory.getLog(HistoryController.class);
 
@@ -47,11 +46,13 @@ public class HistoryController {
     private ElasticsearchTemplate esTemplate;
 
     @RequestMapping(method = RequestMethod.GET, value = { "/artist/{artist}" })
-    @ResponseBody
     public List<Title> requestArtist(@PathVariable("artist") String artist,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "50") int size,
             @RequestParam(value = "full", defaultValue = "false") boolean full) {
+        if (titleRepository.count() <= 0) {
+            return null;
+        }
         Pageable pageable = new PageRequest(page, size, new Sort(
                 Direction.DESC, "time"));
         Page<Title> titles = titleRepository.findByArtist(artist, pageable);
@@ -63,11 +64,13 @@ public class HistoryController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = { "/title/{title}" })
-    @ResponseBody
     public List<Title> requestTitle(@PathVariable("title") String title,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "50") int size,
             @RequestParam(value = "full", defaultValue = "false") boolean full) {
+        if (titleRepository.count() <= 0) {
+            return null;
+        }
         Pageable pageable = new PageRequest(page, size, new Sort(
                 Direction.DESC, "time"));
         Page<Title> titles = titleRepository.findByTitle(title, pageable);
@@ -79,8 +82,10 @@ public class HistoryController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = { "/stations" })
-    @ResponseBody
     public List<String> requestStations() {
+        if (titleRepository.count() <= 0) {
+            return null;
+        }
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(QueryBuilders.matchAllQuery())
                 .withSearchType(SearchType.COUNT)
@@ -118,5 +123,47 @@ public class HistoryController {
     public void deleteTitle(@PathVariable("id") String id) {
         titleRepository.delete(id);
         LOG.info("Deleted Title " + id);
+    }
+
+    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.PUT, value = "/replaceArtist/{token1}/{token2}")
+    public void replaceArtist(@PathVariable("token1") String token1,
+            @PathVariable("token2") String token2) {
+        Pageable pageable = new PageRequest(0, 10, new Sort(Direction.DESC,
+                "time"));
+        while (pageable != null) {
+
+            Page<Title> titles = titleRepository.findByArtist(token1, pageable);
+            if (titles == null) {
+                return;
+            }
+
+            for (Title title : titles.getContent()) {
+                title.setArtist(title.getArtist().replaceAll(token1, token2));
+                titleRepository.save(title);
+            }
+            pageable = titles.nextPageable();
+        }
+    }
+
+    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.PUT, value = "/replaceTitle/{token1}/{token2}")
+    public void replaceTitle(@PathVariable("token1") String token1,
+            @PathVariable("token2") String token2) {
+        Pageable pageable = new PageRequest(0, 10, new Sort(Direction.DESC,
+                "time"));
+        while (pageable != null) {
+
+            Page<Title> titles = titleRepository.findByTitle(token1, pageable);
+            if (titles == null) {
+                return;
+            }
+
+            for (Title title : titles.getContent()) {
+                title.setTitle(title.getTitle().replaceAll(token1, token2));
+                titleRepository.save(title);
+            }
+            pageable = titles.nextPageable();
+        }
     }
 }

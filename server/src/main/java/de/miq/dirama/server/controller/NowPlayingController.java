@@ -1,11 +1,12 @@
 package de.miq.dirama.server.controller;
 
+import java.net.URLDecoder;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
@@ -17,21 +18,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import de.miq.dirama.server.model.Title;
 import de.miq.dirama.server.repository.TitleRepository;
 import de.miq.dirama.server.services.TriggersActionService;
 
-@Controller
-@RequestMapping("/nowplaying")
+@RestController
+@RequestMapping(value = "/nowplaying", produces = "application/json")
 public class NowPlayingController {
     private static final Log LOG = LogFactory
             .getLog(NowPlayingController.class);
@@ -49,13 +49,15 @@ public class NowPlayingController {
     @RequestMapping(method = RequestMethod.POST)
     public void addNowPlaying(
             @RequestBody List<Title> titles,
-            @RequestParam(value = "ignoreNow", defaultValue = "false") boolean ignoreNow) {
+            @RequestParam(value = "ignoreNow", defaultValue = "false") boolean ignoreNow,
+            @RequestParam(value = "trigger", defaultValue = "true") boolean trigger) {
         for (Title title : titles) {
             addNowPlaying(title.getStation(), title.getArtist(),
                     title.getTitle(), title.getDabImage(), title.getWebImage(),
                     DATEFORMAT.format(title.getTime()), title.getAdditional1(),
                     title.getAdditional2(), title.getAdditional3(),
-                    title.getAdditional4(), title.getAdditional5(), ignoreNow);
+                    title.getAdditional4(), title.getAdditional5(),
+                    title.getProperties(), ignoreNow, trigger, false);
         }
     }
 
@@ -73,41 +75,73 @@ public class NowPlayingController {
             @RequestParam(value = "additional3", required = false) String additional3,
             @RequestParam(value = "additional4", required = false) String additional4,
             @RequestParam(value = "additional5", required = false) String additional5,
-            @RequestParam(value = "ignoreNow", defaultValue = "false") boolean ignoreNow) {
+            @RequestParam Map<String, String> requestParams,
+            @RequestParam(value = "ignoreNow", defaultValue = "false") boolean ignoreNow,
+            @RequestParam(value = "trigger", defaultValue = "true") boolean trigger,
+            @RequestParam(value = "doDecode", defaultValue = "false") boolean doDecode) {
+
         Title tt;
         Date now = new Date();
         Date date = null;
+
+        // decode if needed
+        if (doDecode) {
+            artist = decode(artist);
+            title = decode(title);
+            dabImage = decode(dabImage);
+            webImage = decode(webImage);
+            time = decode(time);
+            additional1 = decode(additional1);
+            additional2 = decode(additional2);
+            additional3 = decode(additional3);
+            additional4 = decode(additional4);
+            additional5 = decode(additional5);
+        }
+
         try {
             date = DATEFORMAT.parse(time);
-            if (!ignoreNow) {
-                Date before = DateUtils.addMinutes(now, 10);
-                Date after = DateUtils.addMinutes(now, -10);
-
-                if (!(date.after(after) && date.before(before))) {
-                    throw new ParseException("Date not now", 0);
-                }
-            }
         } catch (Throwable e) {
             LOG.error(e.getMessage() + "; time=" + time, e);
             date = new Date();
+        }
+        if (!ignoreNow) {
+            Date before = DateUtils.addMinutes(now, 10);
+            Date after = DateUtils.addMinutes(now, -10);
+
+            if (!(date.after(after) && date.before(before))) {
+                throw new IllegalStateException("Date not now");
+            }
         }
 
         tt = new Title(station, artist, title, dabImage, webImage, date,
                 additional1, additional2, additional3, additional4, additional5);
 
+        if (requestParams != null) {
+            for (String key : requestParams.keySet()) {
+                if (key.startsWith("PROP.")) {
+                    LOG.info("ADD PROP " + key + "=" + requestParams.get(key));
+                    tt.addProperty(key, requestParams.get(key));
+                }
+            }
+        }
+
         titleRepository.index(tt);
         LOG.info("Added " + tt);
 
-        triggerService.executeTriggers(tt);
+        if (trigger) {
+            triggerService.executeTriggers(tt);
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET, value = { "/{station}" })
-    @ResponseBody
     public List<Title> requestNowPlaying(
             @PathVariable("station") String station,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "50") int size,
             @RequestParam(value = "full", defaultValue = "false") boolean full) {
+        if (titleRepository.count() <= 0) {
+            return null;
+        }
         Pageable pageable = new PageRequest(page, size, new Sort(
                 Direction.DESC, "time"));
         Page<Title> titles = titleRepository.findByStation(station, pageable);
@@ -128,6 +162,14 @@ public class NowPlayingController {
                 ret.add(t);
             }
             return ret;
+        }
+    }
+
+    private String decode(String str) {
+        try {
+            return URLDecoder.decode(str, "ISO-8859-1");
+        } catch (Throwable t) {
+            return str;
         }
     }
 }

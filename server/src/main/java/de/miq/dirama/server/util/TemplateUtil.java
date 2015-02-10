@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.data.domain.PageRequest;
@@ -79,6 +80,12 @@ public class TemplateUtil {
                             title.getAdditional4(), template);
                     str = replace("ADDITIONAL5_", str, pos,
                             title.getAdditional5(), template);
+                    if (title.getProperties() != null) {
+                        for (String key : title.getProperties().keySet()) {
+                            str = replace(key, str, pos,
+                                    title.getProperty(key), template);
+                        }
+                    }
                 }
 
                 File uploadFile = new File(uploadDir, template.getName());
@@ -87,7 +94,11 @@ public class TemplateUtil {
                 try {
                     out.write(str);
                 } finally {
-                    out.close();
+                    try {
+                        out.flush();
+                    } catch (Throwable t) {
+                    }
+                    IOUtils.closeQuietly(out);
                 }
 
                 uploadFiles.add(uploadFile);

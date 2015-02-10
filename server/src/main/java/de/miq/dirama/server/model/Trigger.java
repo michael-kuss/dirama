@@ -36,4 +36,9 @@ public class Trigger {
     public String getAction() {
         return action;
     }
+
+    @Override
+    public String toString() {
+        return "trigger(" + id + "," + cause + "," + action + ")";
+    }
 }

@@ -18,19 +18,31 @@ public class Event {
     @Field(format = DateFormat.basic_date_time, pattern = "yyyyMMddHHmmss", type = FieldType.Date)
     @JsonFormat(pattern = "yyyyMMddHHmmss")
     private Date startDate;
-    @Field(type = FieldType.Long, index = FieldIndex.not_analyzed)
-    private long reaccuring;
+    @Field(format = DateFormat.basic_date_time, pattern = "yyyyMMddHHmmss", type = FieldType.Date)
+    @JsonFormat(pattern = "yyyyMMddHHmmss")
+    private Date endDate;
+    @Field(format = DateFormat.basic_date_time, pattern = "yyyyMMddHHmmss", type = FieldType.Date)
+    @JsonFormat(pattern = "yyyyMMddHHmmss")
+    private Date lastRun;
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    private String cron;
     @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String event;
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    private String station;
 
     public Event() {
     }
 
-    public Event(Date startDate, long reaccuring, String event) {
+    public Event(Date startDate, Date endDate, Date lastRun, String cron,
+            String event, String stations) {
         super();
         this.startDate = startDate;
-        this.reaccuring = reaccuring;
+        this.endDate = endDate;
+        this.lastRun = lastRun;
+        this.cron = cron;
         this.event = event;
+        this.station = station;
     }
 
     public String getId() {
@@ -41,11 +53,27 @@ public class Event {
         return startDate;
     }
 
-    public long getReaccuring() {
-        return reaccuring;
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public Date getLastRun() {
+        return lastRun;
+    }
+
+    public void setLastRun(Date lastRun) {
+        this.lastRun = lastRun;
+    }
+
+    public String getCron() {
+        return cron;
     }
 
     public String getEvent() {
         return event;
+    }
+
+    public String getStation() {
+        return station;
     }
 }

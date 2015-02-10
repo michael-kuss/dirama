@@ -13,21 +13,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import de.miq.dirama.server.config.TriggerActionConfig;
 import de.miq.dirama.server.model.Config;
 import de.miq.dirama.server.repository.ConfigRepository;
 
-@Controller
-@RequestMapping("/config")
+@RestController
+@RequestMapping(value = "/config", produces = "application/json")
 public class ConfigController {
     private static final Log LOG = LogFactory.getLog(ConfigController.class);
 
@@ -53,14 +52,17 @@ public class ConfigController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id:.*}")
     public void deleteConfig(@PathVariable("id") String id) {
         configRepository.delete(id);
-        LOG.info("Deleted Trigger " + id);
+        LOG.info("Deleted " + id);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
-    public List<Config> requestTrigger(
+    public List<Config> requestConfig(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "50") int size) {
+        if (configRepository.count() <= 0) {
+            return null;
+        }
+
         Pageable pageable = new PageRequest(page, size, new Sort(Direction.ASC,
                 "key"));
         Page<Config> config = configRepository.findAll(pageable);
@@ -72,7 +74,6 @@ public class ConfigController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "stored/{token}")
-    @ResponseBody
     public List<Config> requestStoredConfig(@PathVariable("token") String token) {
         if (checkToken.equals("-")) {
             return null;

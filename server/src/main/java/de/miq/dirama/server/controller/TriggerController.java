@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import de.miq.dirama.server.model.Title;
 import de.miq.dirama.server.model.Trigger;
@@ -26,8 +26,8 @@ import de.miq.dirama.server.repository.TitleRepository;
 import de.miq.dirama.server.repository.TriggerRepository;
 import de.miq.dirama.server.services.TriggerActionService;
 
-@Controller
-@RequestMapping("/trigger")
+@RestController
+@RequestMapping(value = "/trigger", produces = "application/json")
 public class TriggerController {
     private static final Log LOG = LogFactory.getLog(TriggerController.class);
 
@@ -57,10 +57,12 @@ public class TriggerController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
     public List<Trigger> requestTrigger(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "50") int size) {
+        if (triggerRepository.count() <= 0) {
+            return null;
+        }
         Pageable pageable = new PageRequest(page, size, new Sort(Direction.ASC,
                 "id"));
         Page<Trigger> trigger = triggerRepository.findAll(pageable);

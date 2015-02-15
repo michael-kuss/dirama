@@ -35,7 +35,7 @@ public class Event {
     }
 
     public Event(Date startDate, Date endDate, Date lastRun, String cron,
-            String event, String stations) {
+            String event, String station) {
         super();
         this.startDate = startDate;
         this.endDate = endDate;

@@ -27,7 +27,7 @@ subprojects {
     apply plugin: 'spring-boot'
 
 	project.sourceCompatibility = 1.7
-	project.version = '0.7.2'
+	project.version = '0.8.0'
 
     repositories {
         mavenLocal()

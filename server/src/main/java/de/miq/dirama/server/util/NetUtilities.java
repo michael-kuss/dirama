@@ -17,9 +17,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import de.miq.dirama.server.model.FtpEntry;
 
 public class NetUtilities {
     private static final int BUFFER = 1024 * 1024;
@@ -183,6 +186,52 @@ public class NetUtilities {
         } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
         }
+    }
+
+    public static List<FtpEntry> listFtp(String ftpServer, String user,
+            String password, String dir) {
+        List<FtpEntry> ret = new ArrayList<FtpEntry>();
+        try {
+            FTPClient ftp = null;
+            try {
+                ftp = login(ftpServer, user, password);
+
+                FTPFile[] files = ftp.listFiles(dir);
+                for (FTPFile file : files) {
+                    ret.add(new FtpEntry(file.getName(), file.getSize(), file
+                            .getTimestamp().getTime(), file.getType()));
+                }
+
+            } finally {
+                logout(ftp);
+            }
+        } catch (Throwable e) {
+            LOG.error(e.getMessage(), e);
+        }
+        return ret;
+    }
+
+    public static byte[] getFtpFile(String ftpServer, String user,
+            String password, String file) {
+        try {
+            FTPClient ftp = null;
+            try {
+                ftp = login(ftpServer, user, password);
+
+                ftp.setFileType(FTP.BINARY_FILE_TYPE);
+
+                InputStream is = ftp.retrieveFileStream(file);
+                byte[] tmp = IOUtils.toByteArray(is);
+                IOUtils.closeQuietly(is);
+
+                return tmp;
+            } finally {
+                logout(ftp);
+            }
+        } catch (Throwable e) {
+            LOG.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     private static void logout(FTPClient ftp) {

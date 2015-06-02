@@ -1,6 +1,8 @@
 package de.miq.dirama.server.controller;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -89,5 +91,35 @@ public class ConfigController {
             return ret;
         }
         return null;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "keys")
+    public List<String> requestConfigKeys(
+            @RequestParam(value = "filter", defaultValue = "") String filter) {
+        List<String> ret = new ArrayList<String>();
+
+        if (configRepository.count() > 0) {
+            Iterable<Config> config = configRepository.findAll();
+            if (config != null) {
+                Iterator<Config> it = config.iterator();
+                while (it.hasNext()) {
+                    Config c = it.next();
+                    if (c.getKey().matches(filter)) {
+                        ret.add(c.getKey());
+                    }
+                }
+            }
+        }
+
+        List<Config> secureConfig = triggerConfig.getSettings();
+        if (secureConfig != null) {
+            for (Config c : secureConfig) {
+                if (c.getKey().matches(filter)) {
+                    ret.add(c.getKey());
+                }
+            }
+        }
+        java.util.Collections.sort(ret);
+        return ret;
     }
 }

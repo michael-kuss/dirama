@@ -111,7 +111,7 @@ public class TriggerActionService {
             String json = mapper.writeValueAsString(object);
 
             NetUtilities.uploadToFtp(ftpServer, user, password, fileName,
-                    IOUtils.toInputStream(json, "UTF8"));
+                    IOUtils.toInputStream(json, "UTF-8"));
 
             return true;
         } catch (Exception e) {

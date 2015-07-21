@@ -1,6 +1,8 @@
 package de.miq.dirama.server.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -23,12 +25,11 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ResultsExtractor;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.miq.dirama.server.model.Title;
@@ -38,6 +39,9 @@ import de.miq.dirama.server.repository.TitleRepository;
 @RequestMapping(value = "/history", produces = "application/json")
 public class HistoryController {
     private static final Log LOG = LogFactory.getLog(HistoryController.class);
+
+    private static final SimpleDateFormat DATE_PATTERN = new SimpleDateFormat(
+            "yyyyMMddHHmmss");
 
     @Autowired
     private TitleRepository titleRepository;
@@ -118,52 +122,34 @@ public class HistoryController {
         return ret;
     }
 
-    @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public void deleteTitle(@PathVariable("id") String id) {
-        titleRepository.delete(id);
-        LOG.info("Deleted Title " + id);
-    }
+    @RequestMapping(method = RequestMethod.GET, value = { "/{station}/{from}/{to}" })
+    public List<Title> requestPlaying(
+            @PathVariable("station") String station,
+            @PathVariable("from") @DateTimeFormat(pattern = "yyyyMMddHHmmss") Date from,
+            @PathVariable("to") @DateTimeFormat(pattern = "yyyyMMddHHmmss") Date to,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "50") int size,
+            @RequestParam(value = "full", defaultValue = "false") boolean full) {
+        Pageable pageable = new PageRequest(page, size, new Sort(
+                Direction.DESC, "time"));
 
-    @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.PUT, value = "/replaceArtist/{token1}/{token2}")
-    public void replaceArtist(@PathVariable("token1") String token1,
-            @PathVariable("token2") String token2) {
-        Pageable pageable = new PageRequest(0, 10, new Sort(Direction.DESC,
-                "time"));
-        while (pageable != null) {
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(
+                        QueryBuilders
+                                .boolQuery()
+                                .must(QueryBuilders.simpleQueryString(station)
+                                        .field("station"))
+                                .must(QueryBuilders.rangeQuery("time")
+                                        .from(DATE_PATTERN.format(from))
+                                        .to(DATE_PATTERN.format(to))))
+                .withIndices("dirama-titles").withTypes("title")
+                .withPageable(pageable).build();
+        Page<Title> titles = esTemplate.queryForPage(searchQuery, Title.class);
 
-            Page<Title> titles = titleRepository.findByArtist(token1, pageable);
-            if (titles == null) {
-                return;
-            }
-
-            for (Title title : titles.getContent()) {
-                title.setArtist(title.getArtist().replaceAll(token1, token2));
-                titleRepository.save(title);
-            }
-            pageable = titles.nextPageable();
+        if (titles == null) {
+            return null;
         }
-    }
 
-    @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.PUT, value = "/replaceTitle/{token1}/{token2}")
-    public void replaceTitle(@PathVariable("token1") String token1,
-            @PathVariable("token2") String token2) {
-        Pageable pageable = new PageRequest(0, 10, new Sort(Direction.DESC,
-                "time"));
-        while (pageable != null) {
-
-            Page<Title> titles = titleRepository.findByTitle(token1, pageable);
-            if (titles == null) {
-                return;
-            }
-
-            for (Title title : titles.getContent()) {
-                title.setTitle(title.getTitle().replaceAll(token1, token2));
-                titleRepository.save(title);
-            }
-            pageable = titles.nextPageable();
-        }
+        return NowPlayingController.filterTitle(full, titles);
     }
 }

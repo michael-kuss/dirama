@@ -77,9 +77,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                     String password = userProps.substring(0, rolePos);
 
-                    LOG.info("Configured user <" + username + "> with pwd <"
-                            + password + "> and role <" + userRole + ">");
-
                     List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
                     while (tokenizer.hasMoreTokens()) {
                         auths.add(new SimpleGrantedAuthority(tokenizer

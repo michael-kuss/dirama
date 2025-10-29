@@ -1,0 +1,69 @@
+
+// add:
+// plugins {
+//   id 'com.diffplug.spotless' version "6.25.0"
+//}
+
+def licenseFileNameJava = 'spotless.license.java'
+
+def f = new File("${rootDir}/corporate/" + licenseFileNameJava)
+
+if (!project.hasProperty("main_branch")) {
+  ext.main_branch = 'origin/main'
+}
+
+spotless {
+  ratchetFrom(getProperty('main_branch'))
+  java {
+    googleJavaFormat('1.24.0')
+    licenseHeaderFile("${rootDir}/corporate/" + licenseFileNameJava).updateYearWithLatest(true)
+
+    toggleOffOn()
+    importOrder()
+    removeUnusedImports()
+
+    formatAnnotations()
+
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
+  groovyGradle {
+    target fileTree(project.projectDir) {
+      include '**/*.gradle'
+      include '**/*.groovy'
+      exclude '**/build/**', '**/build-*/**', '**/.idea/**'
+    }
+    greclipse()
+    indentWithSpaces(2)
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
+  yaml {
+    target fileTree(project.projectDir) {
+      include '**/*.yml'
+      include '**/*.yaml'
+      exclude '**/build/**', '**/build-*/**', '**/.idea/**'
+    }
+    indentWithSpaces(2)
+    endWithNewline()
+    prettier()
+  }
+  format 'misc', {
+    // define the files to apply `misc` to
+    target fileTree(project.projectDir) {
+      include '**/*.md', '**/.gitignore'
+      exclude '**/build/**', '**/build-*/**', '**/.idea/**'
+    }
+
+    trimTrailingWhitespace()
+    indentWithSpaces(2)
+    endWithNewline()
+  }
+  //format 'xml', {
+  //  target fileTree(project.projectDir) {
+  //    include '**/*.xml', '**/*.xsd'
+  //    exclude '**/build/**', '**/build-*/**', '**/.idea/**'
+  //  }
+  //  eclipseWtp('xml')
+  //}
+}

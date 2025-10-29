@@ -1,0 +1,11 @@
+
+ext {
+  getReleaseNumber = {
+    ->
+    Properties props = new Properties()
+    props.load(new FileInputStream("${projectDir}/release.properties"))
+    props.getProperty("releaseNumber")
+  }
+}
+
+version = getReleaseNumber()

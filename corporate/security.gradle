@@ -1,0 +1,85 @@
+
+
+dependencyCheck {
+  nvd {
+    apiKey = System.getenv("NVD_API_KEY")
+    datafeedUrl = 'https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-{0}.json.gz'
+    maxRetryCount = 40
+    delay = 8000
+  }
+  suppressionFile = "${rootDir}/corporate/suppressions.xml"
+  format = 'ALL'
+  scanConfigurations = [
+    "runtimeClasspath",
+    "productionRuntimeClasspath"
+  ]
+  analyzers {
+    assemblyEnabled = false
+    nuspecEnabled = false
+    nugetconfEnabled = false
+    ossIndex.enabled = false
+  }
+}
+
+build.finalizedBy('dependencyCheckAnalyze')
+
+def sbomFileName="${project.name}-${version}-sbom.json"
+
+cyclonedxBom {
+  includeConfigs = ["runtimeClasspath"]
+  skipConfigs = [
+    "compileClasspath",
+    "testCompileClasspath"
+  ]
+  projectType = "application"
+  schemaVersion = "1.4"
+  destination = file("build/reports")
+  outputName = sbomFileName.replaceAll(".json", "")
+  outputFormat = "all"
+  includeBomSerialNumber = true
+  componentVersion = "2.0.0"
+}
+
+//build.finalizedBy cyclonedxBom
+
+tasks.register("sbomFileName") {
+  println sbomFileName
+}
+
+ext.getSbomFilePath = {
+  ->
+  return "${buildDir}/reports/${sbomFileName}"
+}
+
+tasks.register("sbomFilePath") {
+  println getSbomFilePath()
+}
+
+import groovy.json.JsonSlurper
+
+tasks.register("getLicenses") {
+  dependsOn("cyclonedxBom")
+
+  doLast {
+    def inputFile = new File("${buildDir}/reports/${sbomFileName}")
+    def json = new JsonSlurper().parseText(inputFile.text)
+
+    def count = 0;
+    json.components.each {
+      def group = it.group
+      def name = it.name
+      def version = it.version
+
+      if (it != null)
+        it.licenses.each {
+          if (it != null) {
+            def licName = it.license.id;
+            if (licName == null) {
+              licName = it.license.name
+            }
+            println(group + ':' + name + ':' + version + ' = ' + licName)
+          }
+        }
+    }
+  }
+}

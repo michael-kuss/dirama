@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!-- suppress>
+        <notes><![CDATA[
+        This suppresses a CVE from spring-web. we do not deserialize unknown data source
+        ]]></notes>
+        <packageUrl>pkg:maven/org.springframework/spring-web@5.3.31</packageUrl>
+        <vulnerabilityName>CVE-2016-1000027</vulnerabilityName>
+    </suppress -->
+</suppressions>

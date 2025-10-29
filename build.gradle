@@ -1,102 +1,38 @@
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '3.5.7'
+  id 'io.spring.dependency-management' version '1.1.7'
+  id 'com.diffplug.spotless' version "7.0.4"
+  id 'org.owasp.dependencycheck' version "12.1.8"
+  id 'org.cyclonedx.bom' version '2.3.1'
 }
 
-ext {
-    // update also buildscript below!
-    springBootVersion = "1.3.0.BUILD-SNAPSHOT"
+apply from: 'corporate/release.gradle'
+apply from: 'corporate/security.gradle'
+apply from: 'corporate/spotless.gradle'
+
+group = 'de.miq'
+version = '0.0.1-SNAPSHOT'
+description = 'Digital Radio Manager'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
 }
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url "http://repo.spring.io/libs-snapshot" }
-        maven { url "http://repo.spring.io/milestone" }
-   	}
-
-   	dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.0.BUILD-SNAPSHOT")
-    }
+repositories {
+  mavenCentral()
 }
 
-subprojects {
-	apply plugin: 'java'
-	apply plugin: 'eclipse'
-	apply plugin: 'idea'
-    apply plugin: 'spring-boot'
-    apply plugin: 'application'
-
-	project.sourceCompatibility = 1.7
-	project.version = '0.9.0'
-
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url "http://repo.spring.io/libs-snapshot" }
-        maven { url "https://repository.apache.org/content/groups/snapshots/" }
-    }
-    
-    configurations {
-        doclet
-    }
-    
-    dependencies {
-        doclet 'ch.raffael.pegdown-doclet:pegdown-doclet:1.1.1'
-    }
-    
-    javadoc {
-        options.docletpath = configurations.doclet.files.asType(List)
-        options.doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
-    }
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  runtimeOnly 'org.postgresql:postgresql'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-project(':dirama-server') {
-    jar {
-        baseName = 'dirama-service'
-        version =  project.version
-        
-        manifest {
-        	attributes("Implementation-Title": baseName, "Implementation-Version": project.version)
-    	}
-    }
-    
-    mainClassName = "de.miq.dirama.server.config.Application"
-    
-    configurations {
-        compile.exclude module: "spring-jdbc"
-    }
-    
-    dependencies {
-        compile("org.springframework.boot:spring-boot-starter-web:$springBootVersion")        
-     
-        // compile("org.springframework.boot:spring-boot-starter-aop:$springBootVersion")        
-        compile("org.springframework.boot:spring-boot-starter-data-rest:$springBootVersion")
-        // compile("org.springframework.boot:spring-boot-starter-data-jpa")
-        // compile("org.springframework.boot:spring-boot-starter-data-elasticsearch")
-        compile("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
-        // compile("org.springframework.boot:spring-boot-starter-batch:$springBootVersion")
-        //compile("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
-        //compile("org.hsqldb:hsqldb")
-        compile("org.springframework.data:spring-data-elasticsearch") // :1.1.0.RELEASE
-        compile("org.springframework.data:spring-data-rest-webmvc") //:2.1.0.RELEASE
-        // compile("org.elasticsearch:elasticsearch:1.1.1")
-        
-        compile("org.springframework.social:spring-social-twitter") //:1.1.0.RELEASE
-        
-        compile("org.apache.httpcomponents:httpclient") //:4.3.2
-    
-        compile("com.fasterxml.jackson.core:jackson-databind") //:2.3.1
-        compile("com.fasterxml.jackson.dataformat:jackson-dataformat-xml") //:2.3.1
-        
-        compile("commons-io:commons-io:2.4") //
-        compile("commons-net:commons-net:3.3") //
-        
-        compile("org.apache.commons:commons-lang3:3.4") //:3.4
-        
-        //compile("org.apache.commons:commons-imaging:1.0-SNAPSHOT")
-                
-        compile("org.elasticsearch:elasticsearch") //:1.6.0
-    }
+tasks.named('test') {
+  useJUnitPlatform()
 }
-

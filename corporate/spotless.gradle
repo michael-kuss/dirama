@@ -6,8 +6,6 @@
 
 def licenseFileNameJava = 'spotless.license.java'
 
-def f = new File("${rootDir}/corporate/" + licenseFileNameJava)
-
 if (!project.hasProperty("main_branch")) {
   ext.main_branch = 'origin/main'
 }
@@ -34,7 +32,7 @@ spotless {
       exclude '**/build/**', '**/build-*/**', '**/.idea/**'
     }
     greclipse()
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     trimTrailingWhitespace()
     endWithNewline()
   }
@@ -42,9 +40,9 @@ spotless {
     target fileTree(project.projectDir) {
       include '**/*.yml'
       include '**/*.yaml'
-      exclude '**/build/**', '**/build-*/**', '**/.idea/**'
+      exclude '**/build/**', '**/build-*/**', '**/.idea/**', "**/docker-compose.yml"
     }
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     endWithNewline()
     prettier()
   }
@@ -56,8 +54,15 @@ spotless {
     }
 
     trimTrailingWhitespace()
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     endWithNewline()
+  }
+  format 'html', {
+    target fileTree(project.projectDir) {
+      include '**/*.html'
+      exclude '**/build/**', '**/build-*/**', '**/.idea/**'
+    }
+    eclipseWtp('html')
   }
   //format 'xml', {
   //  target fileTree(project.projectDir) {
@@ -67,3 +72,8 @@ spotless {
   //  eclipseWtp('xml')
   //}
 }
+
+//spotlessHtml.dependsOn("spotlessGroovyGradle")
+//spotlessHtml.dependsOn("spotlessJava")
+//spotlessHtml.dependsOn("spotlessMisc")
+//spotlessHtml.dependsOn("spotlessYaml")

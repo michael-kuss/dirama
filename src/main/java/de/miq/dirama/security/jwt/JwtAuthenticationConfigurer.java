@@ -1,0 +1,47 @@
+/**
+ * Copyright (c) 2015-2025 Michael Kuß
+ */
+package de.miq.dirama.security.jwt;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.stereotype.Component;
+
+@Component
+public class JwtAuthenticationConfigurer
+    extends AbstractHttpConfigurer<JwtAuthenticationConfigurer, HttpSecurity> {
+
+  private final JwtAuthenticationProvider jwtAuthenticationProvider;
+
+  private final JwtAuthenticationConverter jwtAuthenticationConverter;
+
+  private final AuthenticationEntryPoint authenticationEntryPoint;
+
+  public JwtAuthenticationConfigurer(
+      JwtAuthenticationProvider jwtAuthenticationProvider,
+      JwtAuthenticationConverter jwtAuthenticationConverter,
+      AuthenticationEntryPoint authenticationEntryPoint) {
+    this.jwtAuthenticationProvider = jwtAuthenticationProvider;
+    this.jwtAuthenticationConverter = jwtAuthenticationConverter;
+    this.authenticationEntryPoint = authenticationEntryPoint;
+  }
+
+  @Override
+  public void init(HttpSecurity http) {
+    http.authenticationProvider(jwtAuthenticationProvider);
+  }
+
+  @Override
+  public void configure(HttpSecurity http) {
+
+    AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+
+    http.addFilterBefore(
+        new JwtAuthenticationFilter(
+            authenticationManager, jwtAuthenticationConverter, authenticationEntryPoint),
+        AuthorizationFilter.class);
+  }
+}

@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: DiRaMa
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dirama
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+  flyway:
+    driverClassName: org.postgresql.Driver
+    locations: classpath:/db/migration/postgres
+    baselineOnMigrate: true
+    validate-on-migrate: true
+    enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: ${CLIENT_ID}
+            clientSecret: ${CLIENT_SECRET}
+
+springdoc:
+  swagger-ui:
+    path=/swagger-ui.html
+
+admin.default:
+  username: admin
+  password: admin
+
+jwt:
+  signing-secret: some-secret
+
+api-key:
+  clients:
+    client-a: abc
+    client-b: 111

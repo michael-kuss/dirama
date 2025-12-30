@@ -36,16 +36,18 @@ spotless {
     trimTrailingWhitespace()
     endWithNewline()
   }
-  yaml {
-    target fileTree(project.projectDir) {
-      include '**/*.yml'
-      include '**/*.yaml'
-      exclude '**/build/**', '**/build-*/**', '**/.idea/**', "**/docker-compose.yml"
-    }
-    leadingTabsToSpaces(2)
-    endWithNewline()
-    prettier()
-  }
+
+  //  yaml {
+  //    target fileTree(project.projectDir) {
+  //      include '**/*.yml'
+  //      include '**/*.yaml'
+  //      exclude '**/build/**', '**/build-*/**', '**/.idea/**', "**/docker-compose.yml"
+  //    }
+  //    leadingTabsToSpaces(2)
+  //    endWithNewline()
+  //    prettier()
+  //  }
+
   format 'misc', {
     // define the files to apply `misc` to
     target fileTree(project.projectDir) {

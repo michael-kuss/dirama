@@ -3,14 +3,14 @@
  */
 package de.miq.dirama.security.jwt;
 
-import de.miq.dirama.dtos.user.UserResponse;
-import de.miq.dirama.dtos.user.UserResponseWithCredentials;
+import de.miq.dirama.dto.user.UserResponse;
+import de.miq.dirama.dto.user.UserResponseWithCredentials;
 import de.miq.dirama.security.exceptions.ApplicationAuthenticationException;
 import de.miq.dirama.security.jwt.dto.LoginDto;
 import de.miq.dirama.security.jwt.dto.TokenDto;
 import de.miq.dirama.security.user.AuthUser;
 import de.miq.dirama.security.user.AuthUserType;
-import de.miq.dirama.services.UserService;
+import de.miq.dirama.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

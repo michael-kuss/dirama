@@ -15,7 +15,7 @@
             padding: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-station: center;
         }
         .nav-links {
             list-style-type: none;
@@ -38,8 +38,8 @@
 <div class="header">
     <ul class="nav-links">
         <li><a href="/">Home</a></li>
-        <li><a href="/items/my">My items</a></li>
-        <li><a href="/items/admin">Admin</a></li>
+        <li><a href="/stations/all">My station</a></li>
+        <li><a href="/stations/admin">Admin</a></li>
     </ul>
     <a class="logout-button" href="/logout">Log out</a>
 </div>

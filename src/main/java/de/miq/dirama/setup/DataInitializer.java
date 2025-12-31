@@ -3,7 +3,7 @@
  */
 package de.miq.dirama.setup;
 
-import de.miq.dirama.services.UserService;
+import de.miq.dirama.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;

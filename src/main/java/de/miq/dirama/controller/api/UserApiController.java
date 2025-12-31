@@ -3,13 +3,14 @@
  */
 package de.miq.dirama.controller.api;
 
+import de.miq.dirama.common.ApiRoot;
 import de.miq.dirama.common.OpenApiConstants;
-import de.miq.dirama.dtos.user.UserCreateRequest;
-import de.miq.dirama.dtos.user.UserPasswordUpdateRequest;
-import de.miq.dirama.dtos.user.UserResponse;
-import de.miq.dirama.dtos.user.UserUpdateRequest;
+import de.miq.dirama.dto.user.UserCreateRequest;
+import de.miq.dirama.dto.user.UserPasswordUpdateRequest;
+import de.miq.dirama.dto.user.UserResponse;
+import de.miq.dirama.dto.user.UserUpdateRequest;
 import de.miq.dirama.security.user.AuthUser;
-import de.miq.dirama.services.UserService;
+import de.miq.dirama.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springdoc.core.annotations.ParameterObject;
@@ -21,7 +22,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(ApiRoot.API_ROOT + "/users")
 public class UserApiController {
 
   private final UserService userService;

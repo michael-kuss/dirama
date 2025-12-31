@@ -4,7 +4,7 @@
 package de.miq.dirama.security.exceptions.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.miq.dirama.dtos.error.ApiErrorResponse;
+import de.miq.dirama.dto.error.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

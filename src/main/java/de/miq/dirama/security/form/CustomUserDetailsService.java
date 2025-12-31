@@ -3,10 +3,10 @@
  */
 package de.miq.dirama.security.form;
 
-import de.miq.dirama.dtos.user.UserResponseWithCredentials;
+import de.miq.dirama.dto.user.UserResponseWithCredentials;
 import de.miq.dirama.security.user.AuthUser;
 import de.miq.dirama.security.user.AuthUserType;
-import de.miq.dirama.services.UserService;
+import de.miq.dirama.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

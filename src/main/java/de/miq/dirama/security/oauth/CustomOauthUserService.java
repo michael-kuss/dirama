@@ -3,11 +3,11 @@
  */
 package de.miq.dirama.security.oauth;
 
-import de.miq.dirama.dtos.user.UserResponse;
-import de.miq.dirama.dtos.user.UserSyncRequest;
+import de.miq.dirama.dto.user.UserResponse;
+import de.miq.dirama.dto.user.UserSyncRequest;
 import de.miq.dirama.security.user.AuthUser;
 import de.miq.dirama.security.user.AuthUserType;
-import de.miq.dirama.services.UserService;
+import de.miq.dirama.service.UserService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;

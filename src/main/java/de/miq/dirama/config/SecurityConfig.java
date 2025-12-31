@@ -3,6 +3,7 @@
  */
 package de.miq.dirama.config;
 
+import de.miq.dirama.common.ApiRoot;
 import de.miq.dirama.security.apikey.ApiKeyAuthenticationConfigurer;
 import de.miq.dirama.security.form.CustomUserDetailsService;
 import de.miq.dirama.security.jwt.JwtAuthenticationConfigurer;
@@ -57,7 +58,7 @@ public class SecurityConfig {
 
     http
         // Apply this filter chain to all requests, except requests to "/api/*"
-        .securityMatcher((request) -> !request.getRequestURI().startsWith("/api"))
+        .securityMatcher((request) -> !request.getRequestURI().startsWith(ApiRoot.API_ROOT))
         // brings UsernamePasswordAuthenticationFilter
         .formLogin(Customizer.withDefaults())
         // brings OAuth2LoginAuthenticationFilter
@@ -71,13 +72,11 @@ public class SecurityConfig {
         // allow requests to Swagger UI
         .authorizeHttpRequests(
             mather ->
-                mather
-                    .requestMatchers(
-                        "/swagger-ui.html",
-                        "/swagger-ui/*",
-                        "/v3/api-docs",
-                        "/v3/api-docs/swagger-config")
-                    .permitAll())
+                mather.requestMatchers(
+                    "/swagger-ui.html",
+                    "/swagger-ui/*",
+                    "/v3/api-docs",
+                    "/v3/api-docs/swagger-config"))
         .authorizeHttpRequests(matcher -> matcher.anyRequest().authenticated())
         .exceptionHandling(customizer -> customizer.accessDeniedPage("/no-access"));
 
@@ -87,7 +86,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 
-    http.securityMatcher("/api/**")
+    http.securityMatcher(ApiRoot.API_ROOT + "/**")
         .with(apiKeyAuthenticationConfigurer, Customizer.withDefaults())
         .with(jwtAuthenticationConfigurer, Customizer.withDefaults())
         .with(authenticationManagerEventListenersConfigurer, Customizer.withDefaults())
@@ -96,7 +95,10 @@ public class SecurityConfig {
                 matcher
                     // method security will be evaluated after DSL configs,
                     // so we have to define public paths upfront
-                    .requestMatchers(HttpMethod.POST, "/api/auth/jwt/login", "/api/users")
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        ApiRoot.API_ROOT + "/auth/jwt/login",
+                        ApiRoot.API_ROOT + "/users")
                     .permitAll())
         .authorizeHttpRequests(matcher -> matcher.anyRequest().authenticated())
         .csrf(AbstractHttpConfigurer::disable)

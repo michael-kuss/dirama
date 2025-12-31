@@ -3,6 +3,7 @@
  */
 package de.miq.dirama.controller.api;
 
+import de.miq.dirama.common.ApiRoot;
 import de.miq.dirama.security.jwt.JwtAuthService;
 import de.miq.dirama.security.jwt.dto.LoginDto;
 import de.miq.dirama.security.jwt.dto.TokenDto;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth/jwt")
+@RequestMapping(ApiRoot.API_ROOT + "/auth/jwt")
 public class JwtAuthApiController {
 
   private final JwtAuthService jwtAuthService;

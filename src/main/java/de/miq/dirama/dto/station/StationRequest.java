@@ -4,5 +4,6 @@
 package de.miq.dirama.dto.station;
 
 import de.miq.dirama.common.StationState;
+import jakarta.validation.constraints.NotNull;
 
-public record StationRequest(String name, StationState stationState) {}
+public record StationRequest(@NotNull String name, StationState stationState) {}

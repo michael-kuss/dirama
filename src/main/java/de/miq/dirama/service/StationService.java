@@ -83,8 +83,11 @@ public class StationService {
   }
 
   private StationEntity getStationEntity(String stationId) {
-
     return stationRepository.findById(stationId).orElseThrow(NotFoundException::new);
+  }
+
+  public StationEntity getStationEntityByName(String stationName) {
+    return stationRepository.findByName(stationName).orElseThrow(NotFoundException::new);
   }
 
   // for this method security responsibilities is scattered between controller and service

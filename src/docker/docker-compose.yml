@@ -30,10 +30,13 @@ services:
     image: dirama:latest
     ports:
       - "8080:8080"
+      - "8000:8000"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/dirama
       - SPRING_DATASOURCE_USERNAME=dirama-postgres
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000
+
     networks:
       - net-dirama

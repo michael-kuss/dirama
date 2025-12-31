@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "com.ihorpolataiko.springbootsecurityweb.controller.api")
+@RestControllerAdvice(basePackages = "de.miq.dirama.controller.api")
 public class RestExceptionControllerAdvice {
 
   @ExceptionHandler(NotFoundException.class)

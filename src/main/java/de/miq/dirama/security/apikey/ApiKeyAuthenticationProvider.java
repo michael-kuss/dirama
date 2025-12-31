@@ -37,11 +37,11 @@ public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
     String apiKey = apiKeyAuthentication.getCredentials();
 
     if (apiKey != null && apiKey.length() > 512) {
-      throw new BadCredentialsException("API key is not valid");
+      throw new BadCredentialsException("API key is not valid1");
     }
 
     if (!apiKeysToClientIds.containsKey(apiKey)) {
-      throw new BadCredentialsException("API key is not valid");
+      throw new BadCredentialsException("API key is not valid2");
     }
 
     String clientId = apiKeysToClientIds.get(apiKey);

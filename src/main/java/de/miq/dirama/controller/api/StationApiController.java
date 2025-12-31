@@ -11,6 +11,7 @@ import de.miq.dirama.security.user.AuthUser;
 import de.miq.dirama.service.StationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,7 @@ public class StationApiController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping
-  public StationResponse createStation(@RequestBody StationRequest stationRequest) {
+  public StationResponse createStation(@Valid @RequestBody StationRequest stationRequest) {
     return stationService.createStation(stationRequest);
   }
 

@@ -1,10 +1,12 @@
 /**
- * Copyright (c) 2015-2025 Michael Kuß
+ * Copyright (c) 2015-2026 Michael Kuß
  */
 package de.miq.dirama.dto.title;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.ZonedDateTime;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record TitleResponse(
     String station,
     String artist,

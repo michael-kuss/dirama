@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2025 Michael Kuß
+ * Copyright (c) 2015-2026 Michael Kuß
  */
 package de.miq.dirama.controller.api;
 
@@ -57,7 +57,7 @@ public class StationApiController {
   @PutMapping("/{id}")
   public StationResponse updateStation(
       @PathVariable("id") String stationId,
-      @RequestBody StationRequest stationRequest,
+      @Valid @RequestBody StationRequest stationRequest,
       @AuthenticationPrincipal AuthUser authUser) {
     return stationService.updateStation(stationId, stationRequest, authUser);
   }

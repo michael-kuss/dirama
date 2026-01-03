@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2025 Michael Kuß
+ * Copyright (c) 2015-2026 Michael Kuß
  */
 package de.miq.dirama.controller.web;
 
@@ -7,6 +7,7 @@ import de.miq.dirama.dto.station.StationRequest;
 import de.miq.dirama.dto.station.StationResponse;
 import de.miq.dirama.security.user.AuthUser;
 import de.miq.dirama.service.StationService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,7 +56,7 @@ public class StationController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/create")
-  public String createStation(@ModelAttribute StationRequest stationRequest) {
+  public String createStation(@Valid @ModelAttribute StationRequest stationRequest) {
     stationService.createStation(stationRequest);
     return "redirect:/stations/all";
   }
@@ -65,7 +66,7 @@ public class StationController {
   public String updateStation(
       @PathVariable("id") String stationId,
       @AuthenticationPrincipal AuthUser authUser,
-      StationRequest stationRequest) {
+      @Valid StationRequest stationRequest) {
     stationService.updateStation(stationId, stationRequest, authUser);
     return "redirect:/stations/all";
   }

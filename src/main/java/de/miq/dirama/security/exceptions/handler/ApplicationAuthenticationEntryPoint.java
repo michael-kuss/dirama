@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2025 Michael Kuß
+ * Copyright (c) 2015-2026 Michael Kuß
  */
 package de.miq.dirama.security.exceptions.handler;
 
@@ -32,7 +32,7 @@ public class ApplicationAuthenticationEntryPoint implements AuthenticationEntryP
 
     log.error("Authentication exception occurred for request: {}", request, authException);
 
-    ApiErrorResponse apiErrorResponse = new ApiErrorResponse(authException.getMessage());
+    ApiErrorResponse apiErrorResponse = new ApiErrorResponse(authException.getMessage(), null);
 
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     response.setContentType("application/json");

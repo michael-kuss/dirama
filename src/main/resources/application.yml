@@ -5,6 +5,7 @@ spring:
     property-naming-strategy: SNAKE_CASE
   datasource:
     url: jdbc:postgresql://localhost:5432/dirama
+    username: dirama-postgres
   freemarker:
     template-loader-path: classpath:/templates/
     suffix: .ftl

@@ -8,7 +8,6 @@ import de.miq.dirama.dto.title.TitleResponse;
 import de.miq.dirama.entity.TitleEntity;
 import de.miq.dirama.mapper.TitleMapper;
 import de.miq.dirama.repository.TitleRepository;
-import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +32,7 @@ public class TitleService {
     titleEntity.setTitle(titleRequest.title());
     titleEntity.setDabImage(titleRequest.dabImage());
     titleEntity.setWebImage(titleRequest.webImage());
-    titleEntity.setTitleDate(ZonedDateTime.now());
+    titleEntity.setTitleDate(titleRequest.titleDate());
     titleEntity.setAdditional1(titleRequest.additional1());
     titleEntity.setAdditional2(titleRequest.additional2());
     titleEntity.setAdditional3(titleRequest.additional3());

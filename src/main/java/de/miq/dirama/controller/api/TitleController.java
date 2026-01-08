@@ -10,7 +10,10 @@ import de.miq.dirama.dto.title.TitleResponse;
 import de.miq.dirama.service.TitleService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
   @SecurityRequirement(name = OpenApiConstants.BEARER_TOKEN_SECURITY_REQUIREMENT),
   @SecurityRequirement(name = OpenApiConstants.API_KEY_SECURITY_REQUIREMENT)
 })
+@Validated
 public class TitleController {
 
   private final TitleService titleService;
@@ -30,7 +34,7 @@ public class TitleController {
   @PreAuthorize("isAuthenticated()")
   @PostMapping(value = {"/{station}"})
   public TitleResponse createTitle(
-      @PathVariable String station, @RequestBody TitleRequest titleRequest) {
+      @NotNull @PathVariable String station, @Valid @RequestBody TitleRequest titleRequest) {
     return titleService.createTitle(station, titleRequest);
   }
 }

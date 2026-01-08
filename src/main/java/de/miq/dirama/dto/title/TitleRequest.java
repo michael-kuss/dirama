@@ -3,14 +3,17 @@
  */
 package de.miq.dirama.dto.title;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
 public record TitleRequest(
-    String artist,
-    String title,
-    String dabImage,
-    String webImage,
-    ZonedDateTime titleDate,
+    @NotNull String artist,
+    @NotNull String title,
+    @NotNull String dabImage,
+    @NotNull String webImage,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMddHHmmss", timezone = "GMT")
+        @NotNull ZonedDateTime titleDate,
     String additional1,
     String additional2,
     String additional3,

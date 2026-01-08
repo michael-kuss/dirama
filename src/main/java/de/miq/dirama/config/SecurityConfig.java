@@ -5,6 +5,7 @@ package de.miq.dirama.config;
 
 import de.miq.dirama.common.ApiRoot;
 import de.miq.dirama.security.apikey.ApiKeyAuthenticationConfigurer;
+import de.miq.dirama.security.basic.BasicAuthenticationConfigurer;
 import de.miq.dirama.security.form.CustomUserDetailsService;
 import de.miq.dirama.security.jwt.JwtAuthenticationConfigurer;
 import de.miq.dirama.security.listener.AuthenticationManagerEventListenersConfigurer;
@@ -28,6 +29,8 @@ public class SecurityConfig {
 
   private final JwtAuthenticationConfigurer jwtAuthenticationConfigurer;
 
+  private final BasicAuthenticationConfigurer basicAuthenticationConfigurer;
+
   private final AuthenticationManagerEventListenersConfigurer
       authenticationManagerEventListenersConfigurer;
 
@@ -41,11 +44,13 @@ public class SecurityConfig {
       CustomUserDetailsService customUserDetailsService,
       ApiKeyAuthenticationConfigurer apiKeyAuthenticationConfigurer,
       JwtAuthenticationConfigurer jwtAuthenticationConfigurer,
+      BasicAuthenticationConfigurer basicAuthenticationConfigurer,
       AuthenticationManagerEventListenersConfigurer authenticationManagerEventListenersConfigurer,
       AuthenticationEntryPoint authenticationEntryPoint,
       AccessDeniedHandler accessDeniedHandler) {
     this.apiKeyAuthenticationConfigurer = apiKeyAuthenticationConfigurer;
     this.jwtAuthenticationConfigurer = jwtAuthenticationConfigurer;
+    this.basicAuthenticationConfigurer = basicAuthenticationConfigurer;
     this.authenticationManagerEventListenersConfigurer =
         authenticationManagerEventListenersConfigurer;
     this.authenticationEntryPoint = authenticationEntryPoint;
@@ -58,7 +63,10 @@ public class SecurityConfig {
 
     http
         // Apply this filter chain to all requests, except requests to "/api/*"
-        .securityMatcher((request) -> !request.getRequestURI().startsWith(ApiRoot.API_ROOT))
+        .securityMatcher(
+            (request) ->
+                !request.getRequestURI().startsWith(ApiRoot.API_ROOT)
+                    && !request.getRequestURI().startsWith("/nowplaying"))
         // brings UsernamePasswordAuthenticationFilter
         .formLogin(Customizer.withDefaults())
         // brings OAuth2LoginAuthenticationFilter
@@ -85,7 +93,6 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-
     http.securityMatcher(ApiRoot.API_ROOT + "/**")
         .with(apiKeyAuthenticationConfigurer, Customizer.withDefaults())
         .with(jwtAuthenticationConfigurer, Customizer.withDefaults())
@@ -111,5 +118,24 @@ public class SecurityConfig {
                     .authenticationEntryPoint(authenticationEntryPoint));
 
     return http.build();
+  }
+
+  @Bean
+  public SecurityFilterChain basicAuthApiFilterChain(HttpSecurity httpSecurity) throws Exception {
+    httpSecurity
+        .securityMatcher("/nowplaying/**")
+        .httpBasic(Customizer.withDefaults())
+        .userDetailsService(customUserDetailsService)
+        .authorizeHttpRequests(matcher -> matcher.anyRequest().authenticated())
+        .csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(
+            configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(
+            customizer ->
+                customizer
+                    .accessDeniedHandler(accessDeniedHandler)
+                    .authenticationEntryPoint(authenticationEntryPoint));
+
+    return httpSecurity.build();
   }
 }

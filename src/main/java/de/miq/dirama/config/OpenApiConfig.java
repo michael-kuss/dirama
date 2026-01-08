@@ -21,4 +21,8 @@ import org.springframework.context.annotation.Configuration;
     type = SecuritySchemeType.APIKEY,
     in = SecuritySchemeIn.HEADER,
     paramName = AuthConstants.API_KEY_AUTHORIZATION_HEADER)
+@SecurityScheme(
+    name = OpenApiConstants.BASIC_SECURITY_REQUIREMENT,
+    type = SecuritySchemeType.HTTP,
+    scheme = "basic")
 public class OpenApiConfig {}

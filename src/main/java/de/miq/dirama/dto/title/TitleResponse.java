@@ -3,17 +3,17 @@
  */
 package de.miq.dirama.dto.title;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.ZonedDateTime;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public record TitleResponse(
     String station,
     String artist,
     String title,
     String dabImage,
     String webImage,
-    ZonedDateTime titleDate,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+        ZonedDateTime titleDate,
     String additional1,
     String additional2,
     String additional3,

@@ -34,7 +34,10 @@ public class TitleController {
   @PreAuthorize("isAuthenticated()")
   @PostMapping(value = {"/{station}"})
   public TitleResponse createTitle(
-      @NotNull @PathVariable String station, @Valid @RequestBody TitleRequest titleRequest) {
-    return titleService.createTitle(station, titleRequest);
+      @NotNull @PathVariable String station,
+      @Valid @RequestBody TitleRequest titleRequest,
+      @RequestParam(value = "ignoreNow", defaultValue = "false") boolean ignoreNow,
+      @RequestParam(value = "trigger", defaultValue = "true") boolean trigger) {
+    return titleService.createTitle(station, titleRequest, ignoreNow, trigger);
   }
 }

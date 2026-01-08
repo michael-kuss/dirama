@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.ZonedDateTime;
 
 public record TitleResponse(
+    String id,
     String station,
     String artist,
     String title,

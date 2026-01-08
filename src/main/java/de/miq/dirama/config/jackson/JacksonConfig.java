@@ -24,7 +24,7 @@ public class JacksonConfig {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
     objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    objectMapper.registerModule(module);
+    // objectMapper.registerModule(module);
     objectMapper.findAndRegisterModules();
 
     return objectMapper;

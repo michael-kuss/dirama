@@ -8,6 +8,8 @@ import de.miq.dirama.dto.title.TitleResponse;
 import de.miq.dirama.entity.TitleEntity;
 import de.miq.dirama.mapper.TitleMapper;
 import de.miq.dirama.repository.TitleRepository;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,19 @@ public class TitleService {
     this.stationService = stationService;
   }
 
-  public TitleResponse createTitle(String station, TitleRequest titleRequest) {
+  public TitleResponse createTitle(
+      String station, TitleRequest titleRequest, boolean ignoreNow, boolean trigger) {
+    ZonedDateTime now = ZonedDateTime.now();
+
+    if (!ignoreNow) {
+      ZonedDateTime before = now.minus(10, ChronoUnit.MINUTES);
+      ZonedDateTime after = now.plus(10, ChronoUnit.MINUTES);
+
+      if (!(titleRequest.titleDate().isAfter(after) && titleRequest.titleDate().isBefore(before))) {
+        throw new IllegalStateException("Date not now");
+      }
+    }
+
     TitleEntity titleEntity = new TitleEntity();
     titleEntity.setStation(stationService.getStationEntityByName(station));
     titleEntity.setArtist(titleRequest.artist());
@@ -40,6 +54,13 @@ public class TitleService {
     titleEntity.setAdditional5(titleRequest.additional5());
 
     TitleEntity result = titleRepository.save(titleEntity);
+
+    log.info("Added {}", titleRequest);
+
+    if (trigger) {
+      // triggerService.executeTriggers(titleRequest);
+    }
+
     return titleMapper.toResponse(result);
   }
 }

@@ -10,7 +10,6 @@ import de.miq.dirama.dto.title.TitleResponse;
 import de.miq.dirama.service.TitleService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,21 +44,9 @@ public class NowPlayingController {
       @RequestParam(value = "additional5", required = false) String additional5,
       @RequestParam(value = "ignoreNow", defaultValue = "false") boolean ignoreNow,
       @RequestParam(value = "trigger", defaultValue = "true") boolean trigger) {
-
-    TitleRequest titleRequest;
-    ZonedDateTime now = ZonedDateTime.now();
     ZonedDateTime dateTime = TimeHelper.convert(time);
 
-    if (!ignoreNow) {
-      ZonedDateTime before = now.minus(10, ChronoUnit.MINUTES);
-      ZonedDateTime after = now.plus(10, ChronoUnit.MINUTES);
-
-      if (!(dateTime.isAfter(after) && dateTime.isBefore(before))) {
-        throw new IllegalStateException("Date not now");
-      }
-    }
-
-    titleRequest =
+    TitleRequest titleRequest =
         new TitleRequest(
             artist,
             title,
@@ -72,12 +59,6 @@ public class NowPlayingController {
             additional4,
             additional5);
 
-    // titleRepository.index(titleRequest);
-    log.info("Added {}", titleRequest);
-
-    if (trigger) {
-      // triggerService.executeTriggers(titleRequest);
-    }
-    return titleService.createTitle(station, titleRequest);
+    return titleService.createTitle(station, titleRequest, ignoreNow, trigger);
   }
 }

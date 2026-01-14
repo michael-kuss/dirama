@@ -12,7 +12,10 @@ public record TitleRequest(
     @NotNull String title,
     @NotNull String dabImage,
     @NotNull String webImage,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMddHHmmss", timezone = "DEFAULT_TIMEZONE")
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyyMMddHHmmss",
+            timezone = "DEFAULT_TIMEZONE")
         @NotNull ZonedDateTime titleDate,
     String additional1,
     String additional2,

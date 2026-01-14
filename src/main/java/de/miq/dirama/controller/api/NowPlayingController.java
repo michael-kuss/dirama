@@ -11,6 +11,10 @@ import de.miq.dirama.service.TitleService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -60,5 +64,11 @@ public class NowPlayingController {
             additional5);
 
     return titleService.createTitle(station, titleRequest, ignoreNow, trigger);
+  }
+
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  @GetMapping
+  public Page<TitleResponse> listAllTitles(@PageableDefault @ParameterObject Pageable pageable) {
+    return titleService.listAllTitles(pageable);
   }
 }

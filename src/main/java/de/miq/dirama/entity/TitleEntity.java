@@ -14,7 +14,7 @@ import org.hibernate.annotations.UuidGenerator;
 public class TitleEntity {
   @Id @UuidGenerator private String id;
 
-  @OneToOne @PrimaryKeyJoinColumn private StationEntity station;
+  @ManyToOne @PrimaryKeyJoinColumn private StationEntity station;
 
   private String artist;
   private String title;

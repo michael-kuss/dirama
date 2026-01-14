@@ -3,23 +3,20 @@
  */
 package de.miq.dirama.entity;
 
-import de.miq.dirama.common.StationState;
 import jakarta.persistence.*;
 import java.time.ZonedDateTime;
 import lombok.Data;
+import org.hibernate.annotations.UuidGenerator;
 
 @Data
 @Entity
-@Table(name = "stations")
-public class StationEntity {
+@Table(name = "triggers")
+public class TriggerEntity {
+  @Id @UuidGenerator private String id;
 
-  // @Id @UuidGenerator private String id;
+  @ManyToOne @PrimaryKeyJoinColumn private StationEntity station;
 
-  @Id
-  @Column(unique = true)
-  private String name;
-
-  private StationState stationState;
+  private String data;
 
   private ZonedDateTime createdDate;
 
@@ -27,12 +24,14 @@ public class StationEntity {
 
   @PrePersist
   public void onPrePersist() {
+
     createdDate = ZonedDateTime.now();
     updatedDate = ZonedDateTime.now();
   }
 
   @PreUpdate
   public void onPreUpdate() {
+
     updatedDate = ZonedDateTime.now();
   }
 }

@@ -40,9 +40,9 @@ public class StationService {
     return stationMapper.toResponse(savedEntity);
   }
 
-  public StationResponse getStation(String stationId) {
+  public StationResponse getStation(String stationName) {
 
-    StationEntity stationEntity = getStationEntity(stationId);
+    StationEntity stationEntity = getStationEntity(stationName);
 
     return stationMapper.toResponse(stationEntity);
   }
@@ -53,9 +53,9 @@ public class StationService {
   }
 
   public StationResponse updateStation(
-      String stationId, StationRequest stationRequest, AuthUser authUser) {
+      String stationName, StationRequest stationRequest, AuthUser authUser) {
 
-    StationEntity stationEntity = getStationEntity(stationId);
+    StationEntity stationEntity = getStationEntity(stationName);
     checkAccessToStation(authUser);
 
     stationEntity.setName(stationRequest.name());
@@ -66,15 +66,15 @@ public class StationService {
     return stationMapper.toResponse(updatedEntity);
   }
 
-  public void deleteStation(String stationId, AuthUser authUser) {
+  public void deleteStation(String stationName, AuthUser authUser) {
 
-    StationEntity stationEntity = getStationEntity(stationId);
+    StationEntity stationEntity = getStationEntity(stationName);
     checkAccessToStation(authUser);
-    stationRepository.deleteById(stationEntity.getId());
+    stationRepository.deleteById(stationEntity.getName());
   }
 
-  private StationResponse setStationState(String stationId, StationState state) {
-    StationEntity stationEntity = getStationEntity(stationId);
+  private StationResponse setStationState(String stationName, StationState state) {
+    StationEntity stationEntity = getStationEntity(stationName);
     stationEntity.setStationState(state);
 
     StationEntity updatedEntity = stationRepository.save(stationEntity);
@@ -82,8 +82,8 @@ public class StationService {
     return stationMapper.toResponse(updatedEntity);
   }
 
-  private StationEntity getStationEntity(String stationId) {
-    return stationRepository.findById(stationId).orElseThrow(NotFoundException::new);
+  private StationEntity getStationEntity(String stationName) {
+    return stationRepository.findById(stationName).orElseThrow(NotFoundException::new);
   }
 
   public StationEntity getStationEntityByName(String stationName) {

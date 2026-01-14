@@ -11,6 +11,8 @@ import de.miq.dirama.repository.TitleRepository;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -62,5 +64,9 @@ public class TitleService {
     }
 
     return titleMapper.toResponse(result);
+  }
+
+  public Page<TitleResponse> listAllTitles(Pageable pageable) {
+    return titleRepository.findAll(pageable).map(titleMapper::toResponse);
   }
 }

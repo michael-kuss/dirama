@@ -29,7 +29,7 @@ public class StationService {
     this.stationMapper = stationMapper;
   }
 
-  public StationResponse createStation(StationRequest stationRequest) {
+  public StationResponse create(StationRequest stationRequest) {
 
     StationEntity stationEntity = new StationEntity();
     stationEntity.setName(stationRequest.name());
@@ -40,19 +40,19 @@ public class StationService {
     return stationMapper.toResponse(savedEntity);
   }
 
-  public StationResponse getStation(String stationName) {
+  public StationResponse get(String stationName) {
 
     StationEntity stationEntity = getStationEntity(stationName);
 
     return stationMapper.toResponse(stationEntity);
   }
 
-  public Page<StationResponse> listAllStations(Pageable pageable) {
+  public Page<StationResponse> listAll(Pageable pageable) {
 
     return stationRepository.findAll(pageable).map(stationMapper::toResponse);
   }
 
-  public StationResponse updateStation(
+  public StationResponse update(
       String stationName, StationRequest stationRequest, AuthUser authUser) {
 
     StationEntity stationEntity = getStationEntity(stationName);
@@ -66,7 +66,7 @@ public class StationService {
     return stationMapper.toResponse(updatedEntity);
   }
 
-  public void deleteStation(String stationName, AuthUser authUser) {
+  public void delete(String stationName, AuthUser authUser) {
 
     StationEntity stationEntity = getStationEntity(stationName);
     checkAccessToStation(authUser);

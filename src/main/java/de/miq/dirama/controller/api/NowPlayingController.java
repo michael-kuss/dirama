@@ -63,12 +63,12 @@ public class NowPlayingController {
             additional4,
             additional5);
 
-    return titleService.createTitle(station, titleRequest, ignoreNow, trigger);
+    return titleService.create(station, titleRequest, ignoreNow, trigger);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping
   public Page<TitleResponse> listAllTitles(@PageableDefault @ParameterObject Pageable pageable) {
-    return titleService.listAllTitles(pageable);
+    return titleService.listAll(pageable);
   }
 }

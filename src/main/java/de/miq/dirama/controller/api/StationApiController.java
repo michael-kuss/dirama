@@ -37,20 +37,20 @@ public class StationApiController {
   @PreAuthorize("isAuthenticated()")
   @PostMapping
   public StationResponse createStation(@Valid @RequestBody StationRequest stationRequest) {
-    return stationService.createStation(stationRequest);
+    return stationService.create(stationRequest);
   }
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/{id}")
   public StationResponse getStation(@PathVariable("id") String stationId) {
-    return stationService.getStation(stationId);
+    return stationService.get(stationId);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping
   public Page<StationResponse> listAllStations(
       @PageableDefault @ParameterObject Pageable pageable) {
-    return stationService.listAllStations(pageable);
+    return stationService.listAll(pageable);
   }
 
   @PreAuthorize("isAuthenticated()")
@@ -59,13 +59,13 @@ public class StationApiController {
       @PathVariable("id") String stationId,
       @Valid @RequestBody StationRequest stationRequest,
       @AuthenticationPrincipal AuthUser authUser) {
-    return stationService.updateStation(stationId, stationRequest, authUser);
+    return stationService.update(stationId, stationRequest, authUser);
   }
 
   @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/{id}")
   public void deleteStation(
       @PathVariable("id") String stationId, @AuthenticationPrincipal AuthUser authUser) {
-    stationService.deleteStation(stationId, authUser);
+    stationService.delete(stationId, authUser);
   }
 }

@@ -28,14 +28,14 @@ public class StationController {
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/all")
   public String userHome(Model model, Pageable pageable) {
-    model.addAttribute("stations", stationService.listAllStations(pageable));
+    model.addAttribute("stations", stationService.listAll(pageable));
     return "stations/all";
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping("/admin")
   public String adminPage(Model model, Pageable pageable) {
-    model.addAttribute("stations", stationService.listAllStations(pageable));
+    model.addAttribute("stations", stationService.listAll(pageable));
     return "stations/admin";
   }
 
@@ -49,7 +49,7 @@ public class StationController {
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/edit/{id}")
   public String editStationPage(@PathVariable("id") String stationId, Model model) {
-    StationResponse stationResponse = stationService.getStation(stationId);
+    StationResponse stationResponse = stationService.get(stationId);
     model.addAttribute("stationRequest", stationResponse);
     return "stations/edit";
   }
@@ -57,7 +57,7 @@ public class StationController {
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/create")
   public String createStation(@Valid @ModelAttribute StationRequest stationRequest) {
-    stationService.createStation(stationRequest);
+    stationService.create(stationRequest);
     return "redirect:/stations/all";
   }
 
@@ -67,7 +67,7 @@ public class StationController {
       @PathVariable("id") String stationId,
       @AuthenticationPrincipal AuthUser authUser,
       @Valid StationRequest stationRequest) {
-    stationService.updateStation(stationId, stationRequest, authUser);
+    stationService.update(stationId, stationRequest, authUser);
     return "redirect:/stations/all";
   }
 
@@ -77,7 +77,7 @@ public class StationController {
       @PathVariable("id") String stationId,
       @AuthenticationPrincipal AuthUser authUser,
       @RequestHeader("referer") String refererHeader) {
-    stationService.deleteStation(stationId, authUser);
+    stationService.delete(stationId, authUser);
 
     // Use referer header to redirect back, because delete can be invoked both from admin page and
     // from user stations page

@@ -29,7 +29,7 @@ public class TitleService {
     this.stationService = stationService;
   }
 
-  public TitleResponse createTitle(
+  public TitleResponse create(
       String station, TitleRequest titleRequest, boolean ignoreNow, boolean trigger) {
     ZonedDateTime now = ZonedDateTime.now();
 
@@ -66,7 +66,7 @@ public class TitleService {
     return titleMapper.toResponse(result);
   }
 
-  public Page<TitleResponse> listAllTitles(Pageable pageable) {
+  public Page<TitleResponse> listAll(Pageable pageable) {
     return titleRepository.findAll(pageable).map(titleMapper::toResponse);
   }
 }

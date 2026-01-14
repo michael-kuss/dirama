@@ -5,9 +5,9 @@ package de.miq.dirama.controller.api;
 
 import de.miq.dirama.common.ApiRoot;
 import de.miq.dirama.common.OpenApiConstants;
-import de.miq.dirama.dto.title.TitleRequest;
-import de.miq.dirama.dto.title.TitleResponse;
-import de.miq.dirama.service.TitleService;
+import de.miq.dirama.dto.trigger.TriggerRequest;
+import de.miq.dirama.dto.trigger.TriggerResponse;
+import de.miq.dirama.service.TriggerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
@@ -21,33 +21,37 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(ApiRoot.API_ROOT + "/title")
+@RequestMapping(ApiRoot.API_ROOT + "/trigger")
 @SecurityRequirements({
   @SecurityRequirement(name = OpenApiConstants.BEARER_TOKEN_SECURITY_REQUIREMENT),
   @SecurityRequirement(name = OpenApiConstants.API_KEY_SECURITY_REQUIREMENT)
 })
 @Validated
-public class TitleController {
+public class TriggerController {
 
-  private final TitleService titleService;
+  private final TriggerService triggerService;
 
-  public TitleController(TitleService titleService) {
-    this.titleService = titleService;
+  public TriggerController(TriggerService triggerService) {
+    this.triggerService = triggerService;
   }
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping(value = {"/{station}"})
-  public TitleResponse createTitle(
-      @NotNull @PathVariable String station,
-      @Valid @RequestBody TitleRequest titleRequest,
-      @RequestParam(value = "ignoreNow", defaultValue = "false") boolean ignoreNow,
-      @RequestParam(value = "trigger", defaultValue = "true") boolean trigger) {
-    return titleService.create(station, titleRequest, ignoreNow, trigger);
+  public TriggerResponse createTrigger(
+      @NotNull @PathVariable String station, @Valid @RequestBody TriggerRequest triggerRequest) {
+    return triggerService.create(station, triggerRequest);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping
-  public Page<TitleResponse> listAllTitles(@PageableDefault @ParameterObject Pageable pageable) {
-    return titleService.listAll(pageable);
+  public Page<TriggerResponse> listAll(@PageableDefault @ParameterObject Pageable pageable) {
+    return triggerService.listAll(pageable);
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping(value = {"/{station}"})
+  public Page<TriggerResponse> listAllTitlesByStation(
+      @NotNull @PathVariable String station, @PageableDefault @ParameterObject Pageable pageable) {
+    return triggerService.listAllByStation(station, pageable);
   }
 }

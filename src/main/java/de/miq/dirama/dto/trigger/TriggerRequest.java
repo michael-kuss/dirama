@@ -3,4 +3,9 @@
  */
 package de.miq.dirama.dto.trigger;
 
-public record TriggerRequest(String stationName, String data) {}
+import de.miq.dirama.common.Triggers;
+import jakarta.validation.constraints.NotNull;
+import java.util.Map;
+
+public record TriggerRequest(
+    @NotNull Triggers trigger, Map<String, String> properties, boolean active) {}

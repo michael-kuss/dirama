@@ -3,8 +3,11 @@
  */
 package de.miq.dirama.entity;
 
+import de.miq.dirama.common.Triggers;
+import de.miq.dirama.config.hibernate.PropertiesAttributeConverter;
 import jakarta.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -16,7 +19,13 @@ public class TriggerEntity {
 
   @ManyToOne @PrimaryKeyJoinColumn private StationEntity station;
 
-  private String data;
+  private Triggers trigger;
+
+  @Convert(converter = PropertiesAttributeConverter.class)
+  @Column(name = "properties", length = 4096)
+  private Map<String, String> properties;
+
+  private boolean active;
 
   private ZonedDateTime createdDate;
 
@@ -24,14 +33,12 @@ public class TriggerEntity {
 
   @PrePersist
   public void onPrePersist() {
-
     createdDate = ZonedDateTime.now();
     updatedDate = ZonedDateTime.now();
   }
 
   @PreUpdate
   public void onPreUpdate() {
-
     updatedDate = ZonedDateTime.now();
   }
 }

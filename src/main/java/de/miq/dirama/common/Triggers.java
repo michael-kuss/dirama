@@ -4,5 +4,6 @@
 package de.miq.dirama.common;
 
 public enum Triggers {
+  LOG,
   RENDER_HTML_PLAYLIST
 }

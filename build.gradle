@@ -53,6 +53,9 @@ dependencies {
   // CVE HOTFIXES
   implementation 'org.apache.commons:commons-lang3:3.20.0'
 
+  implementation "commons-io:commons-io:2.21.0"
+  implementation "commons-net:commons-net:3.12.0"
+
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   runtimeOnly 'org.postgresql:postgresql'
 
@@ -68,19 +71,19 @@ tasks.named('test') {
 
 version = getReleaseNumber()
 
-task dockerPrepare(type: Copy) {
+tasks.register('dockerPrepare', Copy) {
   from 'src/docker/dirama'
   into rootProject.layout.buildDirectory.file('docker')
 }
 
-task dockerProvideJar(type: Copy) {
+tasks.register('dockerProvideJar', Copy) {
   dependsOn bootJar, dockerPrepare
   from rootProject.layout.buildDirectory.file('libs')
   into rootProject.layout.buildDirectory.file('docker')
   include '*.jar'
 }
 
-task dockerBuild(type: Exec) {
+tasks.register('dockerBuild', Exec) {
   dependsOn dockerProvideJar
   workingDir rootProject.layout.buildDirectory.file('docker')
   commandLine 'docker', 'build', '--pull', '-t', rootProject.name + ':latest', '-t', rootProject.name + ':' + getReleaseNumber(), '.'

@@ -5,11 +5,11 @@ package de.miq.dirama.service;
 
 import de.miq.dirama.dto.title.TitleRequest;
 import de.miq.dirama.dto.title.TitleResponse;
+import de.miq.dirama.entity.StationEntity;
 import de.miq.dirama.entity.TitleEntity;
 import de.miq.dirama.mapper.TitleMapper;
 import de.miq.dirama.repository.TitleRepository;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,12 +21,17 @@ public class TitleService {
   private final TitleRepository titleRepository;
   private final TitleMapper titleMapper;
   private final StationService stationService;
+  private final TriggerService triggerService;
 
   public TitleService(
-      TitleRepository titleRepository, TitleMapper titleMapper, StationService stationService) {
+      TitleRepository titleRepository,
+      TitleMapper titleMapper,
+      StationService stationService,
+      TriggerService triggerService) {
     this.titleRepository = titleRepository;
     this.titleMapper = titleMapper;
     this.stationService = stationService;
+    this.triggerService = triggerService;
   }
 
   public TitleResponse create(
@@ -34,33 +39,25 @@ public class TitleService {
     ZonedDateTime now = ZonedDateTime.now();
 
     if (!ignoreNow) {
-      ZonedDateTime before = now.minus(10, ChronoUnit.MINUTES);
-      ZonedDateTime after = now.plus(10, ChronoUnit.MINUTES);
+      ZonedDateTime before = now.minusMinutes(10);
+      ZonedDateTime after = now.plusMinutes(10);
 
       if (!(titleRequest.titleDate().isAfter(after) && titleRequest.titleDate().isBefore(before))) {
         throw new IllegalStateException("Date not now");
       }
     }
 
-    TitleEntity titleEntity = new TitleEntity();
-    titleEntity.setStation(stationService.getStationEntityByName(station));
-    titleEntity.setArtist(titleRequest.artist());
-    titleEntity.setTitle(titleRequest.title());
-    titleEntity.setDabImage(titleRequest.dabImage());
-    titleEntity.setWebImage(titleRequest.webImage());
-    titleEntity.setTitleDate(titleRequest.titleDate());
-    titleEntity.setAdditional1(titleRequest.additional1());
-    titleEntity.setAdditional2(titleRequest.additional2());
-    titleEntity.setAdditional3(titleRequest.additional3());
-    titleEntity.setAdditional4(titleRequest.additional4());
-    titleEntity.setAdditional5(titleRequest.additional5());
+    StationEntity stationEntity = stationService.getStationEntityByName(station);
+
+    TitleEntity titleEntity = titleMapper.toEntity(titleRequest);
+    titleEntity.setStation(stationEntity);
 
     TitleEntity result = titleRepository.save(titleEntity);
 
     log.info("Added {}", titleRequest);
 
     if (trigger) {
-      // triggerService.executeTriggers(titleRequest);
+      triggerService.executeTriggers(stationEntity);
     }
 
     return titleMapper.toResponse(result);

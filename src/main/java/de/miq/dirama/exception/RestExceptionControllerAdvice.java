@@ -47,6 +47,12 @@ public class RestExceptionControllerAdvice {
     return getApiErrorResponse(ex);
   }
 
+  @ExceptionHandler(RuntimeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ApiErrorResponse handleRuntimeException(RuntimeException ex) {
+    return getApiErrorResponse(ex);
+  }
+
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ApiErrorResponse handleValidationExceptions(MethodArgumentNotValidException ex) {

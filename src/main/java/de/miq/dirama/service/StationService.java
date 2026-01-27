@@ -9,7 +9,7 @@ import de.miq.dirama.dto.station.StationRequest;
 import de.miq.dirama.dto.station.StationResponse;
 import de.miq.dirama.entity.StationEntity;
 import de.miq.dirama.exception.NoAccessException;
-import de.miq.dirama.exception.NotFoundException;
+import de.miq.dirama.exception.StationNotFoundException;
 import de.miq.dirama.mapper.StationMapper;
 import de.miq.dirama.repository.StationRepository;
 import de.miq.dirama.security.user.AuthUser;
@@ -83,11 +83,15 @@ public class StationService {
   }
 
   private StationEntity getStationEntity(String stationName) {
-    return stationRepository.findById(stationName).orElseThrow(NotFoundException::new);
+    return stationRepository
+        .findById(stationName)
+        .orElseThrow(() -> new StationNotFoundException(stationName));
   }
 
   public StationEntity getStationEntityByName(String stationName) {
-    return stationRepository.findByName(stationName).orElseThrow(NotFoundException::new);
+    return stationRepository
+        .findByName(stationName)
+        .orElseThrow(() -> new StationNotFoundException(stationName));
   }
 
   // for this method security responsibilities is scattered between controller and service

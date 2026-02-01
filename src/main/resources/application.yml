@@ -9,6 +9,8 @@ spring:
   freemarker:
     template-loader-path: classpath:/templates/
     suffix: .ftl
+    charset: UTF-8
+    content-type: text/html
   flyway:
     driverClassName: org.postgresql.Driver
     locations: classpath:/db/migration/postgres
@@ -28,9 +30,6 @@ spring:
             clientId: ${CLIENT_ID}
             clientSecret: ${CLIENT_SECRET}
 
-springdoc:
-  swagger-ui:
-    path=/swagger-ui.html
 
 admin.default:
   username: admin

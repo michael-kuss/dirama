@@ -31,6 +31,7 @@ public class LogTrigger extends AbstractTrigger {
 
   @Override
   public void execute(StationEntity station) {
+    super.execute(station);
     Pageable pageable =
         PageRequest.of(
             0,

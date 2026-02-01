@@ -35,7 +35,7 @@ public class RenderHtmlPlaylistTrigger extends AbstractTrigger {
   private final List<String> OPTIONA_KEYS = Collections.singletonList(FTP_SERVER_TLS);
 
   @Override
-  public void execute(StationEntity station) {
+  protected void logExecute(StationEntity station) {
     Pageable pageable = PageRequest.of(0, 50, Sort.by(Sort.Direction.DESC, "titleDate"));
     List<TitleEntity> titles =
         titleRepository.findByStationOrderByTitleDateDesc(station, pageable).getContent();

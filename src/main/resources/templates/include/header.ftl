@@ -1,45 +1,38 @@
+<#import "/spring.ftl" as spring/>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>${pageTitle!''}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .item {
-            margin-bottom: 15px;
-        }
-        .header {
-            background-color: #f8f9fa;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-station: center;
-        }
-        .nav-links {
-            list-style-type: none;
-            padding: 0;
-        }
-        .nav-links li {
-            display: inline;
-            margin-right: 15px;
-        }
-        .logout-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-    </style>
+    <link href="/css/base.css" rel="stylesheet">
 </head>
 <body>
-<div class="header">
-    <ul class="nav-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="/stations/all">My station</a></li>
-        <li><a href="/stations/admin">Admin</a></li>
-    </ul>
-    <a class="logout-button" href="/logout">Log out</a>
-</div>
+
+<header class="main-header">
+    <div class="nav-container">
+        <strong>${app}</strong>
+        <#assign uri="${springMacroRequestContext.requestUri}">
+        <nav class="left-nav">
+            <a href="/" class="nav-item ${(uri == "/")?string("active", "")}"><@spring.messageText "nav.dashboard" "Dashboard"/></a>
+            <a href="/stations/all" class="nav-item ${(uri?starts_with("/stations"))?string("active", "")}"><@spring.messageText "nav.stations" "Stations"/></a>
+            <a href="/triggers/all" class="nav-item ${(uri?starts_with("/triggers"))?string("active", "")}"><@spring.messageText "nav.triggers" "Triggers"/></a>
+            <a href="/users/all" class="nav-item ${(uri?starts_with("/users"))?string("active", "")}"><@spring.messageText "nav.users" "Users"/></a>
+        </nav>
+
+        <div class="user-menu">
+            <button class="profile-btn">
+                <span class="user-name">${user.username()}</span>
+                <div class="avatar">${user.abbreviation()}</div>
+            </button>
+            <div class="dropdown-content">
+                <a href="/users/profile" class="dropdown-link">
+                    <i class="icon-user"></i> Mein Profil
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/logout" class="dropdown-link logout">
+                    <i class="icon-logout"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

@@ -12,6 +12,7 @@ import de.miq.dirama.repository.TitleRepository;
 import de.miq.dirama.repository.TriggerRepository;
 import de.miq.dirama.service.trigger.LogTrigger;
 import de.miq.dirama.service.trigger.RenderHtmlPlaylistTrigger;
+import de.miq.dirama.service.trigger.SendFileToFtpTrigger;
 import de.miq.dirama.service.trigger.TriggerInterface;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
@@ -82,8 +83,8 @@ public class TriggerService {
   public Optional<TriggerInterface> build(@NotNull TriggerEntity triggerEntity) {
 
     return switch (triggerEntity.getTrigger()) {
-      case RENDER_HTML_PLAYLIST ->
-          new RenderHtmlPlaylistTrigger(titleRepository).to(triggerEntity);
+      case RENDER_HTML_PLAYLIST -> new RenderHtmlPlaylistTrigger(titleRepository).to(triggerEntity);
+      case SEND_FILE_TO_FTP -> new SendFileToFtpTrigger(titleRepository).to(triggerEntity);
       case LOG -> new LogTrigger(titleRepository).to(triggerEntity);
     };
   }

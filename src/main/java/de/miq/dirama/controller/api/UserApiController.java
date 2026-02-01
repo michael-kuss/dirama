@@ -94,7 +94,7 @@ public class UserApiController {
     @SecurityRequirement(name = OpenApiConstants.API_KEY_SECURITY_REQUIREMENT)
   })
   public Page<UserResponse> listUsers(@PageableDefault @ParameterObject Pageable pageable) {
-    return userService.listUsers(pageable);
+    return userService.listAll(pageable);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")

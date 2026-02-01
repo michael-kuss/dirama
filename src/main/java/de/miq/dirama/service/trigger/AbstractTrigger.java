@@ -3,6 +3,7 @@
  */
 package de.miq.dirama.service.trigger;
 
+import de.miq.dirama.entity.StationEntity;
 import de.miq.dirama.entity.TriggerEntity;
 import de.miq.dirama.exception.TriggerKeyMissingException;
 import java.util.HashMap;
@@ -54,4 +55,13 @@ public abstract class AbstractTrigger implements TriggerInterface {
   public Map<String, String> getProperties() {
     return propererties;
   }
+
+  @Override
+  public void execute(StationEntity station) {
+    log.info("Executing trigger {} : {} : ...", getClass().getName(), getValue(TRIGGER_ENTITY_ID));
+    logExecute(station);
+    log.info("Exucint trigger {} : {} : DONE", getClass().getName(), getValue(TRIGGER_ENTITY_ID));
+  }
+
+  protected void logExecute(StationEntity station) {}
 }

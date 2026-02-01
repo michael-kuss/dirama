@@ -72,7 +72,8 @@ public class SecurityConfig {
         // brings OAuth2LoginAuthenticationFilter
         // .oauth2Login(Customizer.withDefaults())
         // allow public access to the home page
-        .authorizeHttpRequests(mather -> mather.requestMatchers("/").permitAll())
+        // .authorizeHttpRequests(matcher -> matcher.requestMatchers("/").permitAll())
+        .authorizeHttpRequests(matcher -> matcher.requestMatchers("/static/**").permitAll())
         // UserDetailsService implementation to be leveraged by form login
         // UsernamePasswordAuthenticationFilter -> ProviderManager -> DaoAuthenticationProvider ->
         // CustomUserDetailsService

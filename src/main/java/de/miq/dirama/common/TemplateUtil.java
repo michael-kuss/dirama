@@ -86,9 +86,9 @@ public class TemplateUtil {
     }
 
     try {
-      return str.replaceAll("@" + token + pos + "@", entry.replace("$", "╔")).replace("╔", "$");
+      return str.replaceAll("@" + token + pos + "@", entry);
     } catch (Exception e) {
-      log.error("ERROR with <" + token + pos + "> for <" + entry + "> in " + template.getName());
+      log.error("ERROR with <{}{}> for <{}> in {}", token, pos, entry, template.getName());
     }
     return str;
   }
@@ -108,5 +108,12 @@ public class TemplateUtil {
 
   private static String readFile(String path) throws IOException {
     return Files.readString(Paths.get(path), StandardCharsets.UTF_8);
+  }
+
+  public static String replace(String s, TitleEntity title) {
+    return s.replaceAll("#artist", title.getArtist())
+        .replaceAll("#title", title.getTitle())
+        .replaceAll("#dabImage", title.getDabImage())
+        .replaceAll("#webImage", title.getWebImage());
   }
 }

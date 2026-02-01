@@ -27,11 +27,11 @@ import org.springframework.web.bind.annotation.*;
   @SecurityRequirement(name = OpenApiConstants.API_KEY_SECURITY_REQUIREMENT)
 })
 @Validated
-public class TitleController {
+public class TitleApiController {
 
   private final TitleService titleService;
 
-  public TitleController(TitleService titleService) {
+  public TitleApiController(TitleService titleService) {
     this.titleService = titleService;
   }
 

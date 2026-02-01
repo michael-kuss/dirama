@@ -128,7 +128,7 @@ public class UserService {
     return userMapper.toResponse(userEntity);
   }
 
-  public Page<UserResponse> listUsers(Pageable pageable) {
+  public Page<UserResponse> listAll(Pageable pageable) {
 
     return userRepository.findAll(pageable).map(userMapper::toResponse);
   }

@@ -27,11 +27,11 @@ import org.springframework.web.bind.annotation.*;
   @SecurityRequirement(name = OpenApiConstants.API_KEY_SECURITY_REQUIREMENT)
 })
 @Validated
-public class TriggerController {
+public class TriggerApiController {
 
   private final TriggerService triggerService;
 
-  public TriggerController(TriggerService triggerService) {
+  public TriggerApiController(TriggerService triggerService) {
     this.triggerService = triggerService;
   }
 

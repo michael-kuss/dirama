@@ -5,5 +5,6 @@ package de.miq.dirama.common;
 
 public enum Triggers {
   LOG,
+  SEND_FILE_TO_FTP,
   RENDER_HTML_PLAYLIST
 }

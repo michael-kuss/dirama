@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,13 +37,13 @@ public class TitleApiController {
   }
 
   @PreAuthorize("isAuthenticated()")
-  @PostMapping(value = {"/{station}"})
-  public TitleResponse createTitle(
-      @NotNull @PathVariable String station,
+  @PostMapping(value = {"/{stations}"})
+  public List<TitleResponse> createTitle(
+      @NotNull @PathVariable String stations,
       @Valid @RequestBody TitleRequest titleRequest,
       @RequestParam(value = "ignoreNow", defaultValue = "false") boolean ignoreNow,
       @RequestParam(value = "trigger", defaultValue = "true") boolean trigger) {
-    return titleService.create(station, titleRequest, ignoreNow, trigger);
+    return titleService.create(stations, titleRequest, ignoreNow, trigger);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")

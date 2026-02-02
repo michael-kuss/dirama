@@ -10,6 +10,7 @@ import de.miq.dirama.dto.title.TitleResponse;
 import de.miq.dirama.service.TitleService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.ZonedDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -33,9 +34,9 @@ public class NowPlayingController {
 
   @PreAuthorize("isAuthenticated()")
   @ResponseStatus(value = HttpStatus.CREATED)
-  @PostMapping("/{station}")
-  public TitleResponse addNowPlaying(
-      @PathVariable("station") String station,
+  @PostMapping("/{stations}")
+  public List<TitleResponse> addNowPlaying(
+      @PathVariable("stations") String stations,
       @RequestParam("artist") String artist,
       @RequestParam("title") String title,
       @RequestParam("dabImage") String dabImage,
@@ -63,7 +64,7 @@ public class NowPlayingController {
             additional4,
             additional5);
 
-    return titleService.create(station, titleRequest, ignoreNow, trigger);
+    return titleService.create(stations, titleRequest, ignoreNow, trigger);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")

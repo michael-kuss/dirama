@@ -60,7 +60,7 @@ public abstract class AbstractTrigger implements TriggerInterface {
   public void execute(StationEntity station) {
     log.info("Executing trigger {} : {} : ...", getClass().getName(), getValue(TRIGGER_ENTITY_ID));
     logExecute(station);
-    log.info("Exucint trigger {} : {} : DONE", getClass().getName(), getValue(TRIGGER_ENTITY_ID));
+    log.info("Executing trigger {} : {} : DONE", getClass().getName(), getValue(TRIGGER_ENTITY_ID));
   }
 
   protected void logExecute(StationEntity station) {}

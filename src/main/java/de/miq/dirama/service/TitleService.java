@@ -10,6 +10,8 @@ import de.miq.dirama.entity.TitleEntity;
 import de.miq.dirama.mapper.TitleMapper;
 import de.miq.dirama.repository.TitleRepository;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,8 +36,8 @@ public class TitleService {
     this.triggerService = triggerService;
   }
 
-  public TitleResponse create(
-      String station, TitleRequest titleRequest, boolean ignoreNow, boolean trigger) {
+  public List<TitleResponse> create(
+      String stations, TitleRequest titleRequest, boolean ignoreNow, boolean trigger) {
     ZonedDateTime now = ZonedDateTime.now();
 
     if (!ignoreNow) {
@@ -47,20 +49,28 @@ public class TitleService {
       }
     }
 
-    StationEntity stationEntity = stationService.getStationEntityByName(station);
+    List<TitleResponse> responses = new ArrayList<>();
+    List<StationEntity> stationEntities = new ArrayList<>();
+    for (String station : stations.split(",")) {
+      StationEntity stationEntity = stationService.getStationEntityByName(station);
 
-    TitleEntity titleEntity = titleMapper.toEntity(titleRequest);
-    titleEntity.setStation(stationEntity);
+      TitleEntity titleEntity = titleMapper.toEntity(titleRequest);
+      titleEntity.setStation(stationEntity);
 
-    TitleEntity result = titleRepository.save(titleEntity);
+      TitleEntity result = titleRepository.save(titleEntity);
 
-    log.info("Added {}", titleRequest);
+      log.info("Added {} {}", station, titleRequest);
 
-    if (trigger) {
-      triggerService.executeTriggers(stationEntity);
+      stationEntities.add(stationEntity);
+      responses.add(titleMapper.toResponse(result));
     }
 
-    return titleMapper.toResponse(result);
+    if (trigger) {
+      for (StationEntity station : stationEntities) {
+        triggerService.executeTriggers(station);
+      }
+    }
+    return responses;
   }
 
   public Page<TitleResponse> listAll(Pageable pageable) {

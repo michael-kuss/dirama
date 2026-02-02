@@ -29,7 +29,7 @@ public class UserEntity {
   @ElementCollection(fetch = FetchType.EAGER)
   private Set<Role> roles;
 
-  private Boolean active;
+  private boolean active;
 
   private ZonedDateTime createdDate;
 

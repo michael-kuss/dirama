@@ -4,7 +4,6 @@
 package de.miq.dirama.dto.station;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import de.miq.dirama.common.StationState;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record StationResponse(String name, StationState stationState) {}
+public record StationResponse(String name, boolean active) {}

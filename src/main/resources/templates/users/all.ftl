@@ -1,33 +1,40 @@
+<#assign pageTitle="title.users.all">
 <#include "../include/header.ftl">
-<h1>Benutzer</h1>
+<#include "../include/table.ftl">
+<#include "../include/buttons.ftl">
+
+<h1><@spring.message"users.all"/></h1>
 
 <div class="table-container">
     <table class="custom-table">
         <thead>
         <tr>
-            <th>Name</th>
-            <th>Vorname</th>
+            <@sortableHeader "username" "users.username" />
+            <@sortableHeader "firstName" "users.firstName" />
             <th>Nachname</th>
             <th>Rolle</th>
             <th>Status</th>
         </tr>
         </thead>
         <tbody>
-        <#list users.content as u>
+        <#list page.content as u>
             <tr>
                 <td><strong>${u.username()}</strong></td>
                 <td>${u.firstName()}</td>
                 <td>${u.lastName()}</td>
                 <td>${u.roles()?join(", ")}</td>
                 <td>
-                    <span class="status-pill ${u.active()?string('status-active', 'status-pending')}">
-                        ${u.active()?string('Aktiv', 'Inaktiv')}
-                    </span>
+                    <#if user.username() == u.username()>
+                        <@renderStatus u.active() />
+                    <#else>
+                        <@statusButton "/users/update/${u.id()}/toggle/status" u.active() />
+                    </#if>
                 </td>
             </tr>
         </#list>
         </tbody>
     </table>
 </div>
+<@pageNav />
 
 <#include "../include/footer.ftl">

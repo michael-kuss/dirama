@@ -1,10 +1,11 @@
 <#include "../include/header.ftl">
-<h1>Neue Station</h1>
+<h1><@spring.message"stations.new"/></h1>
 <div class="card-container">
 
     <form action="/stations/create" method="post">
         <label for="name">Daten:</label>
-        <input type="text" id="name" name="name">
+        <@spring.formInput "stationRequest.name"/>
+        <@spring.showErrors "<br>"/>
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <div style="display: flex; gap: 15px; margin-top: 20px;">
             <button class="btn-primary" type="submit">Create</button>

@@ -14,7 +14,7 @@ public record UserResponse(
     String firstName,
     String lastName,
     List<Role> roles,
-    Boolean active) {
+    boolean active) {
   public String abbreviation() {
     return firstLetter(firstName, username, 1) + firstLetter(lastName, username, 2);
   }

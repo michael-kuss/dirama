@@ -12,7 +12,7 @@
 body {
     background-color: var(--bg-dark);
     /* Replace with your actual wallpaper path */
-    background-image: url('/images/background.png');
+    background-image: url('/images/background_wide.png');
     background-size: cover;
     background-attachment: fixed;
     background-repeat: no-repeat;
@@ -116,6 +116,30 @@ p {
 .btn-outline:hover {
     background: rgba(255, 255, 255, 0.05);
     border-color: var(--accent-red);
+}
+
+.btn-action {
+
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border-glass);
+    padding: 6px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.btn-action:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent-red);
+}
+
+.btn-action svg {
+    vertical-align: middle;
+    display: inline-block;
 }
 
 .btn {
@@ -371,9 +395,9 @@ p {
 
 /* Status badges */
 .status-pill {
-    padding: 4px 12px;
+    padding: 12px 24px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: bold;
 }
 
@@ -387,4 +411,27 @@ p {
     background: rgba(241, 196, 15, 0.2);
     color: #f1c40f;
     border: 1px solid #f1c40f;
+}
+
+.sortable-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* The Icon Container */
+.sort-icon::after {
+    content: " ▲▼";
+    letter-spacing: -45%;
+    opacity: 0.2;
+}
+.sort-asc::after {
+    content: " ▲";
+    opacity: 1;
+}
+.sort-desc::after {
+    content: " ▼";
+    opacity: 1;
 }

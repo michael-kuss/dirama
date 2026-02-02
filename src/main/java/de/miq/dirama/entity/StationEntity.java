@@ -3,7 +3,6 @@
  */
 package de.miq.dirama.entity;
 
-import de.miq.dirama.common.StationState;
 import jakarta.persistence.*;
 import java.time.ZonedDateTime;
 import lombok.Data;
@@ -19,7 +18,7 @@ public class StationEntity {
   @Column(unique = true)
   private String name;
 
-  private StationState stationState;
+  private boolean active;
 
   private ZonedDateTime createdDate;
 

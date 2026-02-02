@@ -4,10 +4,10 @@
 package de.miq.dirama.service;
 
 import de.miq.dirama.common.Role;
-import de.miq.dirama.common.StationState;
 import de.miq.dirama.dto.station.StationRequest;
 import de.miq.dirama.dto.station.StationResponse;
 import de.miq.dirama.entity.StationEntity;
+import de.miq.dirama.exception.ExistingException;
 import de.miq.dirama.exception.NoAccessException;
 import de.miq.dirama.exception.StationNotFoundException;
 import de.miq.dirama.mapper.StationMapper;
@@ -30,10 +30,15 @@ public class StationService {
   }
 
   public StationResponse create(StationRequest stationRequest) {
-
+    stationRepository
+        .findById(stationRequest.name())
+        .ifPresent(
+            s -> {
+              throw new ExistingException();
+            });
     StationEntity stationEntity = new StationEntity();
     stationEntity.setName(stationRequest.name());
-    stationEntity.setStationState(StationState.ONLINE);
+    stationEntity.setActive(true);
 
     StationEntity savedEntity = stationRepository.save(stationEntity);
 
@@ -42,7 +47,7 @@ public class StationService {
 
   public StationResponse get(String stationName) {
 
-    StationEntity stationEntity = getStationEntity(stationName);
+    StationEntity stationEntity = getEntity(stationName);
 
     return stationMapper.toResponse(stationEntity);
   }
@@ -55,7 +60,7 @@ public class StationService {
   public StationResponse update(
       String stationName, StationRequest stationRequest, AuthUser authUser) {
 
-    StationEntity stationEntity = getStationEntity(stationName);
+    StationEntity stationEntity = getEntity(stationName);
     checkAccessToStation(authUser);
 
     stationEntity.setName(stationRequest.name());
@@ -68,21 +73,18 @@ public class StationService {
 
   public void delete(String stationName, AuthUser authUser) {
 
-    StationEntity stationEntity = getStationEntity(stationName);
+    StationEntity stationEntity = getEntity(stationName);
     checkAccessToStation(authUser);
     stationRepository.deleteById(stationEntity.getName());
   }
 
-  private StationResponse setStationState(String stationName, StationState state) {
-    StationEntity stationEntity = getStationEntity(stationName);
-    stationEntity.setStationState(state);
-
-    StationEntity updatedEntity = stationRepository.save(stationEntity);
-
-    return stationMapper.toResponse(updatedEntity);
+  public void toggleStatus(String id) {
+    StationEntity entity = getEntity(id);
+    entity.setActive(!entity.isActive());
+    stationRepository.save(entity);
   }
 
-  private StationEntity getStationEntity(String stationName) {
+  private StationEntity getEntity(String stationName) {
     return stationRepository
         .findById(stationName)
         .orElseThrow(() -> new StationNotFoundException(stationName));

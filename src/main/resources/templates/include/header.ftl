@@ -1,10 +1,15 @@
 <#import "/spring.ftl" as spring/>
+<#assign shownTitle>
+    <@spring.messageText pageTitle!'' '' />
+</#assign>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>${pageTitle!''}</title>
+    <title>${shownTitle}</title>
     <link href="/css/base.css" rel="stylesheet">
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
 </head>
 <body>
 
@@ -13,10 +18,14 @@
         <strong>${app}</strong>
         <#assign uri="${springMacroRequestContext.requestUri}">
         <nav class="left-nav">
-            <a href="/" class="nav-item ${(uri == "/")?string("active", "")}"><@spring.messageText "nav.dashboard" "Dashboard"/></a>
-            <a href="/stations/all" class="nav-item ${(uri?starts_with("/stations"))?string("active", "")}"><@spring.messageText "nav.stations" "Stations"/></a>
-            <a href="/triggers/all" class="nav-item ${(uri?starts_with("/triggers"))?string("active", "")}"><@spring.messageText "nav.triggers" "Triggers"/></a>
-            <a href="/users/all" class="nav-item ${(uri?starts_with("/users"))?string("active", "")}"><@spring.messageText "nav.users" "Users"/></a>
+            <a href="/"
+               class="nav-item ${(uri == "/")?string("active", "")}"><@spring.messageText "nav.dashboard" "Dashboard"/></a>
+            <a href="/stations/all"
+               class="nav-item ${(uri?starts_with("/stations"))?string("active", "")}"><@spring.messageText "nav.stations" "Stations"/></a>
+            <a href="/triggers/all"
+               class="nav-item ${(uri?starts_with("/triggers"))?string("active", "")}"><@spring.messageText "nav.triggers" "Triggers"/></a>
+            <a href="/users/all"
+               class="nav-item ${(uri?starts_with("/users"))?string("active", "")}"><@spring.messageText "nav.users" "Users"/></a>
         </nav>
 
         <div class="user-menu">

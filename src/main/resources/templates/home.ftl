@@ -1,3 +1,4 @@
+<#assign pageTitle="title.dashboard">
 <#include "./include/header.ftl">
 <h1>This is public home page</h1>
 <div class="card-container">

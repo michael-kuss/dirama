@@ -3,9 +3,6 @@
  */
 package de.miq.dirama.dto.station;
 
-import de.miq.dirama.common.StationState;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
-public record StationRequest(
-    @NotNull @Size(min = 1, max = 512) String name, StationState stationState) {}
+public record StationRequest(@Pattern(regexp = "^[a-z0-9_]{1,256}$") String name, Boolean active) {}

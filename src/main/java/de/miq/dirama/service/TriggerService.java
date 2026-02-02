@@ -7,6 +7,7 @@ import de.miq.dirama.dto.trigger.TriggerRequest;
 import de.miq.dirama.dto.trigger.TriggerResponse;
 import de.miq.dirama.entity.StationEntity;
 import de.miq.dirama.entity.TriggerEntity;
+import de.miq.dirama.exception.NotFoundException;
 import de.miq.dirama.mapper.TriggerMapper;
 import de.miq.dirama.repository.TitleRepository;
 import de.miq.dirama.repository.TriggerRepository;
@@ -42,12 +43,13 @@ public class TriggerService {
   }
 
   public TriggerResponse create(String station, TriggerRequest request) {
-    TriggerEntity entity = new TriggerEntity();
 
-    entity.setTrigger(request.trigger());
+    TriggerEntity entity = triggerMapper.toEntity(request); // new TriggerEntity();
+
+    // entity.setTrigger(request.trigger());
     entity.setStation(stationService.getStationEntityByName(station));
-    entity.setProperties(request.properties());
-    entity.setActive(request.active());
+    // entity.setProperties(request.properties());
+    // entity.setActive(request.active());
 
     build(entity);
 
@@ -64,6 +66,20 @@ public class TriggerService {
     return triggerRepository
         .findAllByStation(stationService.getStationEntityByName(station), pageable)
         .map(triggerMapper::toResponse);
+  }
+
+  public void toggleStatus(String id) {
+    TriggerEntity entity = getEntity(id);
+    entity.setActive(!entity.isActive());
+    triggerRepository.save(entity);
+  }
+
+  public TriggerResponse update(String id, TriggerRequest triggerRequest) {
+    TriggerEntity triggerEntity = getEntity(id);
+
+    TriggerEntity updatedEntity = triggerRepository.save(triggerEntity);
+
+    return triggerMapper.toResponse(updatedEntity);
   }
 
   public void executeTriggers(StationEntity station) {
@@ -87,5 +103,13 @@ public class TriggerService {
       case SEND_FILE_TO_FTP -> new SendFileToFtpTrigger(titleRepository).to(triggerEntity);
       case LOG -> new LogTrigger(titleRepository).to(triggerEntity);
     };
+  }
+
+  private TriggerEntity getEntity(String id) {
+    return triggerRepository.findById(id).orElseThrow(NotFoundException::new);
+  }
+
+  public void delete(String id) {
+    triggerRepository.deleteById(id);
   }
 }

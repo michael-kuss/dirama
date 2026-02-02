@@ -89,7 +89,7 @@ public class UserService {
           "Password can be updated only for internal users");
     }
 
-    UserEntity userEntity = getUserEntity(authUser.userId());
+    UserEntity userEntity = getEntity(authUser.userId());
 
     if (!passwordEncoder.matches(
         passwordUpdateRequest.oldPassword(), userEntity.getPasswordHash())) {
@@ -102,16 +102,18 @@ public class UserService {
   }
 
   public UserResponseWithCredentials getUserCredentialsByUsername(String username) {
-
     UserEntity userEntity =
         userRepository.findByUsername(username).orElseThrow(NotFoundException::new);
+    if (!userEntity.isActive()) {
+      throw new NotFoundException();
+    }
     return new UserResponseWithCredentials(
         userMapper.toResponse(userEntity), userEntity.getPasswordHash());
   }
 
   public UserResponse updateUser(String userId, UserUpdateRequest userUpdateRequest) {
 
-    UserEntity userEntity = getUserEntity(userId);
+    UserEntity userEntity = getEntity(userId);
 
     userEntity.setUsername(userUpdateRequest.username());
     userEntity.setFirstName(userUpdateRequest.firstName());
@@ -124,7 +126,7 @@ public class UserService {
 
   public UserResponse getUserById(String userId) {
 
-    UserEntity userEntity = getUserEntity(userId);
+    UserEntity userEntity = getEntity(userId);
     return userMapper.toResponse(userEntity);
   }
 
@@ -135,7 +137,7 @@ public class UserService {
 
   public UserResponse activateUser(String userId) {
 
-    UserEntity userEntity = getUserEntity(userId);
+    UserEntity userEntity = getEntity(userId);
     userEntity.setActive(true);
 
     UserEntity updatedEntity = userRepository.save(userEntity);
@@ -144,7 +146,7 @@ public class UserService {
 
   public UserResponse deactivateUser(String userId) {
 
-    UserEntity userEntity = getUserEntity(userId);
+    UserEntity userEntity = getEntity(userId);
     userEntity.setActive(false);
 
     UserEntity updatedEntity = userRepository.save(userEntity);
@@ -153,7 +155,7 @@ public class UserService {
 
   public UserResponse promoteUserToAdmin(String userId) {
 
-    UserEntity userEntity = getUserEntity(userId);
+    UserEntity userEntity = getEntity(userId);
     userEntity.getRoles().add(Role.ROLE_ADMIN);
 
     UserEntity updatedEntity = userRepository.save(userEntity);
@@ -182,8 +184,14 @@ public class UserService {
     log.info("Default admin user was created with id={}", savedUser.getId());
   }
 
-  private UserEntity getUserEntity(String userId) {
+  private UserEntity getEntity(String userId) {
 
     return userRepository.findById(userId).orElseThrow(NotFoundException::new);
+  }
+
+  public void toggleStatus(String username) {
+    UserEntity entity = getEntity(username);
+    entity.setActive(!entity.isActive());
+    userRepository.save(entity);
   }
 }

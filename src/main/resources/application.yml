@@ -29,7 +29,12 @@ spring:
           github:
             clientId: ${CLIENT_ID}
             clientSecret: ${CLIENT_SECRET}
-
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 512KB
+      max-request-size: 512KB
+      location: ${java.io.tmpdir}
 
 admin.default:
   username: admin

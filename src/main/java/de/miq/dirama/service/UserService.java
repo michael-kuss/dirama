@@ -6,6 +6,8 @@ package de.miq.dirama.service;
 import de.miq.dirama.common.Role;
 import de.miq.dirama.dto.user.*;
 import de.miq.dirama.entity.UserEntity;
+import de.miq.dirama.exception.ExistingException;
+import de.miq.dirama.exception.NoAccessException;
 import de.miq.dirama.exception.NotFoundException;
 import de.miq.dirama.mapper.UserMapper;
 import de.miq.dirama.repository.UserRepository;
@@ -46,7 +48,13 @@ public class UserService {
     this.passwordEncoder = passwordEncoder;
   }
 
-  public UserResponse registerUser(UserCreateRequest userCreateRequest) {
+  public UserResponse create(UserCreateRequest userCreateRequest) {
+    userRepository
+        .findByUsername(userCreateRequest.username())
+        .ifPresent(
+            u -> {
+              throw new ExistingException();
+            });
 
     UserEntity userEntity = new UserEntity();
     userEntity.setUsername(userCreateRequest.username());
@@ -54,6 +62,9 @@ public class UserService {
     userEntity.setFirstName(userCreateRequest.firstName());
     userEntity.setLastName(userCreateRequest.lastName());
     userEntity.setRoles(Set.of(Role.ROLE_USER));
+    if (userCreateRequest.avatarReference() != null) {
+      userEntity.setAvatarReference(userCreateRequest.avatarReference());
+    }
     userEntity.setActive(true);
 
     UserEntity savedEntity = userRepository.save(userEntity);
@@ -193,5 +204,17 @@ public class UserService {
     UserEntity entity = getEntity(username);
     entity.setActive(!entity.isActive());
     userRepository.save(entity);
+  }
+
+  public void delete(String id, AuthUser authUser) {
+    checkAccessToStation(authUser);
+    userRepository.deleteById(id);
+  }
+
+  // for this method security responsibilities is scattered between controller and service
+  private void checkAccessToStation(AuthUser authUser) {
+    if (!authUser.roles().contains(Role.ROLE_ADMIN)) {
+      throw new NoAccessException();
+    }
   }
 }

@@ -31,6 +31,8 @@ public class UserEntity {
 
   private boolean active;
 
+  private String avatarReference;
+
   private ZonedDateTime createdDate;
 
   private ZonedDateTime updatedDate;

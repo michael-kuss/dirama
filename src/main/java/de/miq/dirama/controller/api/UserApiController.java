@@ -35,7 +35,7 @@ public class UserApiController {
   @PostMapping
   public UserResponse registerUser(@RequestBody UserCreateRequest userCreateRequest) {
 
-    return userService.registerUser(userCreateRequest);
+    return userService.create(userCreateRequest);
   }
 
   @PreAuthorize("isAuthenticated()")

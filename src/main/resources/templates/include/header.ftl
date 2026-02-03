@@ -31,7 +31,12 @@
         <div class="user-menu">
             <button class="profile-btn">
                 <span class="user-name">${user.username()}</span>
+                <#if user.avatarReference()?has_content>
+                    <img class="avatar border" src="/avatars/${user.avatarReference()}"
+                         alt="${user.username()}">
+                <#else>
                 <div class="avatar">${user.abbreviation()}</div>
+                </#if>
             </button>
             <div class="dropdown-content">
                 <a href="/users/profile" class="dropdown-link">

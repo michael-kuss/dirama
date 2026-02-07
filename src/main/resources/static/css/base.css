@@ -95,7 +95,6 @@ p {
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
-    font-size: 0.85rem;
     letter-spacing: 1px;
 }
 
@@ -120,17 +119,17 @@ p {
 }
 
 .btn-action {
-
     background: transparent;
-    color: var(--text-main);
+    color: var(--accent-red);
     border: 1px solid var(--border-glass);
-    padding: 6px;
-    border-radius: 50%;
-    align-items: center;
-    justify-content: center;
     transition: all 0.3s ease;
-    vertical-align: middle;
-    display: inline-block;
+    border-radius: 50%;
+    vertical-align: bottom;
+}
+
+.btn-action div {
+    display: flex;
+    justify-content: center;
 }
 
 .btn-action:hover {
@@ -138,9 +137,9 @@ p {
     border-color: var(--accent-red);
 }
 
-.btn-action svg {
+.inline-icon {
+    font-size: 1em;
     vertical-align: middle;
-    display: inline-block;
 }
 
 .btn {
@@ -444,10 +443,12 @@ p {
     letter-spacing: -45%;
     opacity: 0.2;
 }
+
 .sort-asc::after {
     content: " ▲";
     opacity: 1;
 }
+
 .sort-desc::after {
     content: " ▼";
     opacity: 1;
@@ -455,5 +456,5 @@ p {
 
 .rounded {
     border-radius: 10%;
-    overflow:hidden;
+    overflow: hidden;
 }

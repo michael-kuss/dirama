@@ -37,9 +37,9 @@
 
         <#-- Previous Button -->
         <#if !page.first>
-            <a class="btn-primary" href="?page=${current - 1}${urlParams}"><@spring.message "tables.prev" /></a>
+            <a class="btn-primary" href="?page=${current - 1}${urlParams}"><div class="material-symbols-rounded inline-icon">arrow_back_ios</div><@spring.message "tables.prev" /></a>
         <#else>
-            <span class="btn-outline"><@spring.message "tables.prev" /></span>
+            <span class="btn-outline"><div class="material-symbols-rounded inline-icon">chevron_backward</div><@spring.message "tables.prev" /></span>
         </#if>
         <#-- Page Numbers -->
         <#list start..end as i>
@@ -49,9 +49,9 @@
         </#list>
         <#-- Next Button -->
         <#if !page.last>
-            <a class="btn-primary" href="?page=${current + 1}${urlParams}"><@spring.message "tables.next" /></a>
+            <a class="btn-primary" href="?page=${current + 1}${urlParams}"><@spring.message "tables.next" /><div class="material-symbols-rounded inline-icon">arrow_forward_ios</div></a>
         <#else>
-            <span class="btn-outline"><@spring.message "tables.next" /></span>
+            <span class="btn-outline"><@spring.message "tables.next" /><div class="material-symbols-rounded inline-icon">chevron_forward</div></span>
         </#if>
         <div>
     </nav>

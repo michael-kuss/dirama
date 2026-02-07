@@ -1,4 +1,5 @@
 <#import "/spring.ftl" as spring/>
+
 <#assign shownTitle>
     <@spring.messageText pageTitle!'' '' />
 </#assign>
@@ -8,6 +9,7 @@
     <meta charset="UTF-8">
     <title>${shownTitle}</title>
     <link href="/css/base.css" rel="stylesheet">
+    <link href="/css/material.css" rel="stylesheet">
     <meta name="_csrf" content="${_csrf.token}"/>
     <meta name="_csrf_header" content="${_csrf.headerName}"/>
 </head>

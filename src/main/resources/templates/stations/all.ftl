@@ -22,7 +22,7 @@
                     <@statusButton "/stations/update/${station.name()}/toggle/status" station.active() />
                 </td>
                 <td>
-                    <button class="btn-outline"><a href="/stations/edit/${station.name()}">Edit</a></button>
+                    <@editButton "/stations/edit/${station.name()}" />
                     <@deleteButton "/stations/delete/${station.name()}" />
                 </td>
             </tr>

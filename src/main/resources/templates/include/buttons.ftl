@@ -36,3 +36,7 @@
         </button>
     </form>
 </#macro>
+
+<#macro editButton url>
+    <a href="${url}"><button class="btn-action"><div class="material-symbols-rounded">edit</div></button></a>
+</#macro>

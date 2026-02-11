@@ -14,6 +14,7 @@ import de.miq.dirama.repository.UserRepository;
 import de.miq.dirama.security.exceptions.ApplicationAuthenticationException;
 import de.miq.dirama.security.user.AuthUser;
 import java.util.Set;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -122,13 +123,24 @@ public class UserService {
         userMapper.toResponse(userEntity), userEntity.getPasswordHash());
   }
 
-  public UserResponse updateUser(String userId, UserUpdateRequest userUpdateRequest) {
+  public UserResponse update(
+      @NonNull String userId,
+      @NonNull UserUpdateRequest userUpdateRequest,
+      @NonNull AuthUser authUser) {
+    checkAdminAccess(authUser);
 
     UserEntity userEntity = getEntity(userId);
 
-    userEntity.setUsername(userUpdateRequest.username());
-    userEntity.setFirstName(userUpdateRequest.firstName());
-    userEntity.setLastName(userUpdateRequest.lastName());
+    if (!userEntity.getUsername().equals(userUpdateRequest.username())) {
+      userRepository
+          .findByUsername(userUpdateRequest.username())
+          .ifPresent(
+              u -> {
+                throw new ExistingException();
+              });
+    }
+
+    userMapper.update(userEntity, userUpdateRequest);
 
     UserEntity updatedEntity = userRepository.save(userEntity);
 
@@ -136,7 +148,6 @@ public class UserService {
   }
 
   public UserResponse getUserById(String userId) {
-
     UserEntity userEntity = getEntity(userId);
     return userMapper.toResponse(userEntity);
   }
@@ -207,12 +218,12 @@ public class UserService {
   }
 
   public void delete(String id, AuthUser authUser) {
-    checkAccessToStation(authUser);
+    checkAdminAccess(authUser);
     userRepository.deleteById(id);
   }
 
   // for this method security responsibilities is scattered between controller and service
-  private void checkAccessToStation(AuthUser authUser) {
+  private void checkAdminAccess(AuthUser authUser) {
     if (!authUser.roles().contains(Role.ROLE_ADMIN)) {
       throw new NoAccessException();
     }

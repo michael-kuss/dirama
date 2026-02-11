@@ -44,6 +44,7 @@
                     </#if>
                 </td>
                 <td>
+                    <@editButton "/users/edit/${u.id()}" />
                     <@deleteButton "/users/delete/${u.id()}" />
                 </td>
             </tr>

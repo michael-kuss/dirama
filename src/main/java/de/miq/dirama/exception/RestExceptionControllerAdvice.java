@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "de.miq.dirama.controller.api")
+@RestControllerAdvice("de.miq.dirama.controller.api")
 public class RestExceptionControllerAdvice {
 
   @ExceptionHandler(NotFoundException.class)

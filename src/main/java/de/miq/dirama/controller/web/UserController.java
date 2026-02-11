@@ -4,6 +4,8 @@
 package de.miq.dirama.controller.web;
 
 import de.miq.dirama.dto.user.UserCreateRequest;
+import de.miq.dirama.dto.user.UserResponse;
+import de.miq.dirama.dto.user.UserUpdateRequest;
 import de.miq.dirama.exception.ExistingException;
 import de.miq.dirama.security.user.AuthUser;
 import de.miq.dirama.service.ImageService;
@@ -51,6 +53,42 @@ public class UserController {
   @GetMapping("/new")
   public String newEntity(@ModelAttribute UserCreateRequest userCreateRequest) {
     return "users/new";
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping("/edit/{id}")
+  public String editStationPage(@PathVariable("id") String id, Model model) {
+    UserResponse response = userService.getUserById(id);
+    model.addAttribute("id", id);
+    model.addAttribute("userRequest", response);
+    return "users/edit";
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @PostMapping("/update/{id}")
+  public String updateStation(
+      @PathVariable("id") String id,
+      @RequestParam(value = "file", required = false) MultipartFile file,
+      @ModelAttribute("userRequest") UserUpdateRequest request,
+      @AuthenticationPrincipal AuthUser authUser,
+      BindingResult bindingResult) {
+    validator.validate(request, bindingResult);
+    if (bindingResult.hasErrors()) {
+      return "users/edit";
+    }
+
+    try {
+      UserUpdateRequest updateRequest = request;
+      if (Objects.nonNull(file) && !file.isEmpty()) {
+        updateRequest = request.setAvatarReference(imageService.storeImage(file));
+      }
+
+      userService.update(id, updateRequest, authUser);
+    } catch (ExistingException e) {
+      bindingResult.rejectValue("username", "username.existing", "Username exists!");
+      return "users/edit";
+    }
+    return "redirect:/users/all";
   }
 
   @PreAuthorize("isAuthenticated()")

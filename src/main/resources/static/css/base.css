@@ -458,3 +458,17 @@ p {
     border-radius: 10%;
     overflow: hidden;
 }
+
+.icon {
+    color: rgba(0, 0, 0, 0.3);
+    font-size: 100px;
+    position: absolute;
+    top: 49%;
+    transform: translate(-100%, -50%);
+    -ms-transform: translate(-100%, -50%);
+    text-align: center;
+    -webkit-text-stroke-color:rgba(255, 255, 255, 0.3);
+    text-stroke-color:rgba(255, 255, 255, 0.3);
+    -webkit-text-stroke-width:1px;
+    text-stroke-width:1px;
+}

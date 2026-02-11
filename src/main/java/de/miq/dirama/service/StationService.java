@@ -61,7 +61,7 @@ public class StationService {
       String stationName, StationRequest stationRequest, AuthUser authUser) {
 
     StationEntity stationEntity = getEntity(stationName);
-    checkAccessToStation(authUser);
+    checkAdminAccess(authUser);
 
     stationEntity.setName(stationRequest.name());
     // stationEntity.setStationState(StationState.CHANGED);
@@ -74,7 +74,7 @@ public class StationService {
   public void delete(String stationName, AuthUser authUser) {
 
     StationEntity stationEntity = getEntity(stationName);
-    checkAccessToStation(authUser);
+    checkAdminAccess(authUser);
     stationRepository.deleteById(stationEntity.getName());
   }
 
@@ -97,7 +97,7 @@ public class StationService {
   }
 
   // for this method security responsibilities is scattered between controller and service
-  private void checkAccessToStation(AuthUser authUser) {
+  private void checkAdminAccess(AuthUser authUser) {
     if (!authUser.roles().contains(Role.ROLE_ADMIN)) {
       throw new NoAccessException();
     }

@@ -57,8 +57,10 @@ public class UserApiController {
     @SecurityRequirement(name = OpenApiConstants.API_KEY_SECURITY_REQUIREMENT)
   })
   public UserResponse updateUser(
-      @PathVariable("id") String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
-    return userService.updateUser(userId, userUpdateRequest);
+      @PathVariable("id") String userId,
+      @RequestBody UserUpdateRequest userUpdateRequest,
+      @AuthenticationPrincipal AuthUser authUser) {
+    return userService.update(userId, userUpdateRequest, authUser);
   }
 
   // check isAuthenticated(), because authentication.principal is String for anonymous

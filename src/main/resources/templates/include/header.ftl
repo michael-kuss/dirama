@@ -1,4 +1,5 @@
 <#import "/spring.ftl" as spring/>
+<#import "/include/security.ftl" as security/>
 
 <#assign shownTitle>
     <@spring.messageText pageTitle!'' '' />
@@ -37,16 +38,21 @@
                     <img class="avatar border" src="/avatars/${user.avatarReference()}"
                          alt="${user.username()}">
                 <#else>
-                <div class="avatar">${user.abbreviation()}</div>
+                    <div class="avatar">${user.abbreviation()}</div>
                 </#if>
             </button>
             <div class="dropdown-content">
                 <a href="/users/profile" class="dropdown-link">
-                    <i class="icon-user"></i> Mein Profil
+                    <i class="icon-user"></i><@spring.messageText "nav.my-profile" "My Profile"/>
                 </a>
+                <@security.authorize role="ADMIN">
+                    <a href="/swagger-ui/index.html" class="dropdown-link">
+                        <i class="icon-user"></i><@spring.messageText "nav.swagger-ui" "Swagger-UI"/>
+                    </a>
+                </@security.authorize>
                 <div class="dropdown-divider"></div>
                 <a href="/logout" class="dropdown-link logout">
-                    <i class="icon-logout"></i> Logout
+                    <i class="icon-logout"></i> <@spring.messageText "nav.logout" "Logout"/>
                 </a>
             </div>
         </div>

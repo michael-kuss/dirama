@@ -22,15 +22,15 @@
             <tr>
                 <td>
                     <div class="user-menu">
-                    <div class="profile-btn">
-                        <span class="user-name">${u.username()}</span>
-                        <#if u.avatarReference()?has_content>
-                            <img class="avatar border" src="/avatars/${u.avatarReference()}"
-                                 alt="${u.username()}">
-                        <#else>
-                            <div class="avatar">${u.abbreviation()}</div>
-                        </#if>
-                    </div>
+                        <div class="profile-btn">
+                            <span class="user-name">${u.username()}</span>
+                            <#if u.avatarReference()?has_content>
+                                <img class="avatar border" src="/avatars/${u.avatarReference()}"
+                                     alt="${u.username()}">
+                            <#else>
+                                <div class="avatar">${u.abbreviation()}</div>
+                            </#if>
+                        </div>
                     </div>
                 </td>
                 <td>${u.firstName()}</td>

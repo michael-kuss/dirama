@@ -12,7 +12,7 @@ public record UserCreateRequest(
     @NotBlank String firstName,
     @NotBlank String lastName,
     String avatarReference) {
-  public UserCreateRequest setAvatarReference(String reference) {
+  public UserCreateRequest newWithAvatarReference(String reference) {
     return new UserCreateRequest(
         this.username, this.password, this.firstName, this.lastName, reference);
   }

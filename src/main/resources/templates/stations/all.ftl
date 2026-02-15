@@ -17,13 +17,25 @@
         <tbody>
         <#list page.content as station>
             <tr>
-                <td>${station.name()}</td>
                 <td>
-                    <@statusButton "/stations/update/${station.name()}/toggle/status" station.active() />
+                    <div class="user-menu">
+                        <div class="profile-btn">
+                            <span class="user-name">${station.name()}</span>
+                            <#if station.avatarReference()?has_content>
+                                <img class="avatar border" src="/avatars/${station.avatarReference()}"
+                                     alt="${station.name()}">
+                            <#else>
+                                <div class="avatar"></div>
+                            </#if>
+                        </div>
+                    </div>
                 </td>
                 <td>
-                    <@editButton "/stations/edit/${station.name()}" />
-                    <@deleteButton "/stations/delete/${station.name()}" />
+                    <@statusButton "/stations/update/${station.id()}/toggle/status" station.active() />
+                </td>
+                <td>
+                    <@editButton "/stations/edit/${station.id()}" />
+                    <@deleteButton "/stations/delete/${station.id()}" />
                 </td>
             </tr>
         </#list>

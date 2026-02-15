@@ -207,11 +207,12 @@ public class UserService {
   }
 
   private UserEntity getEntity(String userId) {
-
     return userRepository.findById(userId).orElseThrow(NotFoundException::new);
   }
 
-  public void toggleStatus(String username) {
+  public void toggleStatus(String username, AuthUser authUser) {
+    checkAdminAccess(authUser);
+
     UserEntity entity = getEntity(username);
     entity.setActive(!entity.isActive());
     userRepository.save(entity);
@@ -219,6 +220,7 @@ public class UserService {
 
   public void delete(String id, AuthUser authUser) {
     checkAdminAccess(authUser);
+
     userRepository.deleteById(id);
   }
 

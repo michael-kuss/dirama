@@ -57,7 +57,7 @@ public class UserController {
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/edit/{id}")
-  public String editStationPage(@PathVariable("id") String id, Model model) {
+  public String editStationPage(@PathVariable String id, Model model) {
     UserResponse response = userService.getUserById(id);
     model.addAttribute("id", id);
     model.addAttribute("userRequest", response);
@@ -67,7 +67,7 @@ public class UserController {
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/update/{id}")
   public String updateStation(
-      @PathVariable("id") String id,
+      @PathVariable String id,
       @RequestParam(value = "file", required = false) MultipartFile file,
       @ModelAttribute("userRequest") UserUpdateRequest request,
       @AuthenticationPrincipal AuthUser authUser,
@@ -80,7 +80,7 @@ public class UserController {
     try {
       UserUpdateRequest updateRequest = request;
       if (Objects.nonNull(file) && !file.isEmpty()) {
-        updateRequest = request.setAvatarReference(imageService.storeImage(file));
+        updateRequest = request.newWithAvatarReference(imageService.storeImage(file));
       }
 
       userService.update(id, updateRequest, authUser);
@@ -107,7 +107,7 @@ public class UserController {
         image = imageService.storeImage(file);
       }
 
-      userService.create(userCreateRequest.setAvatarReference(image));
+      userService.create(userCreateRequest.newWithAvatarReference(image));
     } catch (ExistingException e) {
       bindingResult.rejectValue("username", "username.existing", "Username exists!");
       return "users/new";
@@ -130,8 +130,9 @@ public class UserController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/update/{id}/toggle/status")
-  public String toggleStatus(@PathVariable("id") String username) {
-    userService.toggleStatus(username);
+  public String toggleStatus(
+      @PathVariable("id") String username, @AuthenticationPrincipal AuthUser authUser) {
+    userService.toggleStatus(username, authUser);
     return "redirect:/users/all";
   }
 }

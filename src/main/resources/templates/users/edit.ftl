@@ -12,7 +12,7 @@
                     <tbody>
                     <tr>
                         <td style="text-align: center">
-                           <@avatar userRequest.avatarReference()!"" true />
+                            <@avatar userRequest.avatarReference()!"" true />
                             <@spring.formInput "userRequest.avatarReference" "style='display: none'"/>
                         </td>
                         <td>

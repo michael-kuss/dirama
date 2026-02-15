@@ -36,8 +36,10 @@ public class StationService {
             s -> {
               throw new ExistingException();
             });
+
     StationEntity stationEntity = new StationEntity();
     stationEntity.setName(stationRequest.name());
+    stationEntity.setAvatarReference(stationRequest.avatarReference());
     stationEntity.setActive(true);
 
     StationEntity savedEntity = stationRepository.save(stationEntity);
@@ -45,9 +47,9 @@ public class StationService {
     return stationMapper.toResponse(savedEntity);
   }
 
-  public StationResponse get(String stationName) {
+  public StationResponse get(String id) {
 
-    StationEntity stationEntity = getEntity(stationName);
+    StationEntity stationEntity = getEntity(id);
 
     return stationMapper.toResponse(stationEntity);
   }
@@ -57,37 +59,43 @@ public class StationService {
     return stationRepository.findAll(pageable).map(stationMapper::toResponse);
   }
 
-  public StationResponse update(
-      String stationName, StationRequest stationRequest, AuthUser authUser) {
-
-    StationEntity stationEntity = getEntity(stationName);
+  public StationResponse update(String id, StationRequest stationRequest, AuthUser authUser) {
     checkAdminAccess(authUser);
 
-    stationEntity.setName(stationRequest.name());
-    // stationEntity.setStationState(StationState.CHANGED);
+    StationEntity stationEntity = getEntity(id);
+
+    if (!stationEntity.getName().equals(stationRequest.name())) {
+      stationRepository
+          .findByName(stationRequest.name())
+          .ifPresent(
+              u -> {
+                throw new ExistingException();
+              });
+    }
+    stationMapper.update(stationEntity, stationRequest);
 
     StationEntity updatedEntity = stationRepository.save(stationEntity);
 
     return stationMapper.toResponse(updatedEntity);
   }
 
-  public void delete(String stationName, AuthUser authUser) {
-
-    StationEntity stationEntity = getEntity(stationName);
+  public void delete(String id, AuthUser authUser) {
     checkAdminAccess(authUser);
-    stationRepository.deleteById(stationEntity.getName());
+
+    StationEntity stationEntity = getEntity(id);
+    stationRepository.deleteById(stationEntity.getId());
   }
 
-  public void toggleStatus(String id) {
+  public void toggleStatus(String id, AuthUser authUser) {
+    checkAdminAccess(authUser);
+
     StationEntity entity = getEntity(id);
     entity.setActive(!entity.isActive());
     stationRepository.save(entity);
   }
 
-  private StationEntity getEntity(String stationName) {
-    return stationRepository
-        .findById(stationName)
-        .orElseThrow(() -> new StationNotFoundException(stationName));
+  private StationEntity getEntity(String id) {
+    return stationRepository.findById(id).orElseThrow(() -> new StationNotFoundException(id));
   }
 
   public StationEntity getStationEntityByName(String stationName) {

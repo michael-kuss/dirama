@@ -45,7 +45,7 @@
     </a>
 </#macro>
 
-<#macro avatar reference editable>
+<#macro avatar reference editable editableIcon="person_edit" staticIcon="person" hoverEditIcon="edit">
     <#if editable>
         <script type="text/javascript">
             function readURL(input) {
@@ -76,9 +76,9 @@
 
     <#assign avatar_icon>
         <#if editable>
-            person_edit
+            ${editableIcon}
         <#else >
-            person
+            ${staticIcon}
         </#if>
     </#assign>
 
@@ -89,7 +89,7 @@
                  src="/avatars/${reference}">
             <#if editable>
             <div id="avatar" class="material-symbols rounded border icon" style="font-size: 150px;">
-               edit
+               ${hoverEditIcon}
             </div>
             </#if>
         <#else>

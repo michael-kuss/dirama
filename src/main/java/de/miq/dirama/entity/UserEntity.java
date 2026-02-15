@@ -39,7 +39,6 @@ public class UserEntity {
 
   @PrePersist
   public void onPrePersist() {
-
     createdDate = ZonedDateTime.now();
     updatedDate = ZonedDateTime.now();
   }

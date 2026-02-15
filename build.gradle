@@ -38,6 +38,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-freemarker'
   //implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   //implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+  implementation 'no.api.freemarker:freemarker-java8:3.0.3'
 
   implementation "org.mapstruct:mapstruct:$mapStructVersion"
 
@@ -63,7 +64,6 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   // testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-  testImplementation 'org.springframework:spring-mock:2.0.8'
 }
 
 tasks.named('test') {
